@@ -48,11 +48,7 @@ function runPythonForecast(history, forecastDays = 7) {
          * successfully tested it from PowerShell.
          */
 
-        const python =
-            spawn(
-                "python",
-                [pythonScript]
-            );
+        const python = spawn("python3", [pythonScript]);
 
 
         let output = "";
