@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="MedSupply Intelligence - Admin and Inventory Management"
+    >
+
+    <title>Admin | MedSupply Intelligence</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+</head>
+
+<body>
+
+    <div class="app-shell">
+
+        <!-- =================================================
+             SIDEBAR
+             ================================================= -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+
+                <div class="brand-mark">
+                    MS
+                </div>
+
+                <div>
+                    <div class="brand-title">
+                        MedSupply
+                    </div>
+
+                    <div class="brand-subtitle">
+                        Intelligence
+                    </div>
+                </div>
+
+            </div>
+
+
+            <nav class="sidebar-nav">
+
+                <a
+                    href="/pages/dashboard.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">▦</span>
+                    <span>Dashboard</span>
+                </a>
+
+
+                <a
+                    href="/pages/admin.html"
+                    class="nav-item active"
+                >
+                    <span class="nav-icon">▣</span>
+                    <span>Admin</span>
+                </a>
+
+
+                <a
+                    href="/pages/billing.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">▤</span>
+                    <span>Billing</span>
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-bottom">
+
+                <div class="system-status">
+
+                    <span class="status-dot"></span>
+
+                    <div>
+                        <strong>System Online</strong>
+                        <small>MedSupply Core</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             MAIN CONTENT
+             ================================================= -->
+
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+
+            <header class="topbar">
+
+                <div>
+
+                    <div class="page-eyebrow">
+                        ADMINISTRATION
+                    </div>
+
+                    <h1>
+                        Inventory Control
+                    </h1>
+
+                    <p class="page-description">
+                        Manage medicines, suppliers and incoming
+                        inventory through supplier invoices.
+                    </p>
+
+                </div>
+
+
+                <div class="topbar-actions">
+
+                    <a
+                        href="/pages/dashboard.html"
+                        class="btn btn-secondary"
+                    >
+                        Dashboard
+                    </a>
+
+                    <a
+                        href="/pages/billing.html"
+                        class="btn btn-primary"
+                    >
+                        Open Billing
+                    </a>
+
+                </div>
+
+            </header>
+
+
+            <!-- =================================================
+                 SYSTEM BANNER
+                 ================================================= -->
+
+            <section class="system-banner">
+
+                <div class="system-banner-icon">
+                    AI
+                </div>
+
+                <div>
+
+                    <strong>
+                        AI-assisted inventory management
+                    </strong>
+
+                    <span>
+                        Upload supplier invoices to extract medicine,
+                        batch, quantity, expiry and pricing information.
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 INVOICE SCANNER
+                 ================================================= -->
+
+            <section class="card invoice-scanner-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="page-eyebrow">
+                            SUPPLIER INTAKE
+                        </div>
+
+                        <h2>
+                            AI Supplier Invoice Scanner
+                        </h2>
+
+                        <p>
+                            Upload a supplier invoice and let OCR
+                            extract the inventory information.
+                        </p>
+
+                    </div>
+
+
+                    <div class="card-status">
+                        AI OCR
+                    </div>
+
+                </div>
+
+
+                <!-- Upload area -->
+
+                <div
+                    class="invoice-upload-area"
+                    id="invoiceUploadArea"
+                >
+
+                    <input
+                        type="file"
+                        id="invoiceFile"
+                        name="invoice"
+                        accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                        hidden
+                    >
+
+
+                    <div class="upload-icon">
+                        ↑
+                    </div>
+
+
+                    <h3>
+                        Upload supplier invoice
+                    </h3>
+
+
+                    <p>
+                        JPG, JPEG or PNG
+                        <br>
+                        Maximum file size: 10 MB
+                    </p>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        id="chooseInvoiceBtn"
+                    >
+                        Choose Invoice
+                    </button>
+
+
+                    <div
+                        class="selected-file"
+                        id="selectedInvoiceFile"
+                    >
+                        No invoice selected
+                    </div>
+
+                </div>
+
+
+                <!-- Scan controls -->
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        id="scanInvoiceBtn"
+                        disabled
+                    >
+                        Scan Invoice with AI
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        id="resetScannerBtn"
+                    >
+                        Reset
+                    </button>
+
+                </div>
+
+
+                <!-- OCR loading -->
+
+                <div
+                    class="loading-panel"
+                    id="ocrLoading"
+                    hidden
+                >
+
+                    <div class="loading-spinner"></div>
+
+                    <div>
+
+                        <strong>
+                            AI is processing the invoice...
+                        </strong>
+
+                        <span>
+                            OCR extraction may take a few seconds.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OCR message -->
+
+                <div
+                    class="message-box"
+                    id="invoiceMessage"
+                    hidden
+                ></div>
+
+            </section>
+
+
+            <!-- =================================================
+                 OCR SUMMARY
+                 ================================================= -->
+
+            <section
+                class="card"
+                id="ocrSummarySection"
+                hidden
+            >
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="page-eyebrow">
+                            OCR RESULT
+                        </div>
+
+                        <h2>
+                            Extracted Invoice
+                        </h2>
+
+                    </div>
+
+                    <span
+                        class="status-badge status-success"
+                        id="ocrStatus"
+                    >
+                        SCANNED
+                    </span>
+
+                </div>
+
+
+                <div class="summary-grid">
+
+                    <div class="summary-item">
+
+                        <span>
+                            Invoice Number
+                        </span>
+
+                        <strong id="invoiceNumberDisplay">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Supplier
+                        </span>
+
+                        <strong id="supplierDisplay">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Invoice Date
+                        </span>
+
+                        <strong id="invoiceDateDisplay">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Medicines Detected
+                        </span>
+
+                        <strong id="itemsDetectedDisplay">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 EXTRACTED MEDICINES
+                 ================================================= -->
+
+            <section
+                class="card"
+                id="extractedItemsSection"
+                hidden
+            >
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="page-eyebrow">
+                            MEDICINE MATCHING
+                        </div>
+
+                        <h2>
+                            Extracted Medicines
+                        </h2>
+
+                        <p>
+                            Verify each OCR result and match it with
+                            the medicine master data before confirmation.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="data-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    OCR Medicine
+                                </th>
+
+                                <th>
+                                    Inventory Medicine
+                                </th>
+
+                                <th>
+                                    Batch
+                                </th>
+
+                                <th>
+                                    Quantity
+                                </th>
+
+                                <th>
+                                    Expiry
+                                </th>
+
+                                <th>
+                                    Unit Cost
+                                </th>
+
+                                <th>
+                                    Match
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="extractedItemsBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="7"
+                                    class="empty-state"
+                                >
+                                    No extracted medicines yet.
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 INVOICE CONFIRMATION
+                 ================================================= -->
+
+            <section
+                class="card confirmation-card"
+                id="invoiceConfirmationSection"
+                hidden
+            >
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="page-eyebrow">
+                            STOCK IN
+                        </div>
+
+                        <h2>
+                            Confirm Inventory Update
+                        </h2>
+
+                        <p>
+                            Review the extracted data before adding
+                            the medicines to inventory.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="confirmation-grid">
+
+                    <!-- Invoice number -->
+
+                    <div class="form-group">
+
+                        <label for="invoiceNumber">
+                            Invoice Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="invoiceNumber"
+                            placeholder="Invoice number"
+                        >
+
+                    </div>
+
+
+                    <!-- Supplier -->
+
+                    <div class="form-group">
+
+                        <label for="supplierSelect">
+                            Supplier
+                        </label>
+
+                        <select id="supplierSelect">
+
+                            <option value="">
+                                Select supplier
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Invoice date -->
+
+                    <div class="form-group">
+
+                        <label for="invoiceDate">
+                            Invoice Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="invoiceDate"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Confirmation summary -->
+
+                <div class="confirmation-summary">
+
+                    <div>
+
+                        <span>
+                            Medicines
+                        </span>
+
+                        <strong id="confirmationItemCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Total Units
+                        </span>
+
+                        <strong id="confirmationTotalQuantity">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Inventory Action
+                        </span>
+
+                        <strong>
+                            STOCK IN
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-primary btn-large"
+                        id="confirmInvoiceBtn"
+                    >
+                        Confirm Invoice
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        id="cancelInvoiceBtn"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="message-box"
+                    id="confirmationMessage"
+                    hidden
+                ></div>
+
+            </section>
+
+
+            <!-- =================================================
+                 RAW OCR
+                 ================================================= -->
+
+            <section
+                class="card"
+                id="rawOcrSection"
+                hidden
+            >
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="page-eyebrow">
+                            OCR DETAILS
+                        </div>
+
+                        <h2>
+                            Raw OCR Text
+                        </h2>
+
+                        <p>
+                            Original text returned by the OCR engine.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <pre
+                    class="ocr-text"
+                    id="rawOcrText"
+                ></pre>
+
+            </section>
+
+
+            <!-- =================================================
+                 MEDICINE MASTER
+                 ================================================= -->
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="page-eyebrow">
+                            MASTER DATA
+                        </div>
+
+                        <h2>
+                            Add Medicine
+                        </h2>
+
+                        <p>
+                            Add a medicine to the inventory master
+                            before receiving stock.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    id="medicineForm"
+                    class="medicine-form"
+                >
+
+                    <div class="form-grid">
+
+                        <!-- Name -->
+
+                        <div class="form-group">
+
+                            <label for="medicineName">
+                                Medicine Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="medicineName"
+                                name="name"
+                                placeholder="e.g. Paracetamol"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Category -->
+
+                        <div class="form-group">
+
+                            <label for="medicineCategory">
+                                Category
+                            </label>
+
+                            <input
+                                type="text"
+                                id="medicineCategory"
+                                name="category"
+                                placeholder="e.g. Analgesic"
+                            >
+
+                        </div>
+
+
+                        <!-- Unit -->
+
+                        <div class="form-group">
+
+                            <label for="medicineUnit">
+                                Unit
+                            </label>
+
+                            <select
+                                id="medicineUnit"
+                                name="unit"
+                            >
+
+                                <option value="units">
+                                    Units
+                                </option>
+
+                                <option value="boxes">
+                                    Boxes
+                                </option>
+
+                                <option value="bottles">
+                                    Bottles
+                                </option>
+
+                                <option value="vials">
+                                    Vials
+                                </option>
+
+                                <option value="packs">
+                                    Packs
+                                </option>
+
+                                <option value="strips">
+                                    Strips
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Criticality -->
+
+                        <div class="form-group">
+
+                            <label for="medicineCriticality">
+                                Criticality
+                            </label>
+
+                            <select
+                                id="medicineCriticality"
+                                name="criticality"
+                            >
+
+                                <option value="LOW">
+                                    Low
+                                </option>
+
+                                <option value="MEDIUM" selected>
+                                    Medium
+                                </option>
+
+                                <option value="HIGH">
+                                    High
+                                </option>
+
+                                <option value="CRITICAL">
+                                    Critical
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Initial stock -->
+
+                        <div class="form-group">
+
+                            <label for="medicineStock">
+                                Initial Stock
+                            </label>
+
+                            <input
+                                type="number"
+                                id="medicineStock"
+                                name="current_stock"
+                                min="0"
+                                step="1"
+                                value="0"
+                            >
+
+                        </div>
+
+
+                        <!-- Minimum stock -->
+
+                        <div class="form-group">
+
+                            <label for="medicineMinimumStock">
+                                Minimum Stock
+                            </label>
+
+                            <input
+                                type="number"
+                                id="medicineMinimumStock"
+                                name="minimum_stock"
+                                min="0"
+                                step="1"
+                                value="0"
+                            >
+
+                        </div>
+
+
+                        <!-- Emergency reserve -->
+
+                        <div class="form-group">
+
+                            <label for="medicineReserve">
+                                Emergency Reserve
+                            </label>
+
+                            <input
+                                type="number"
+                                id="medicineReserve"
+                                name="emergency_reserve"
+                                min="0"
+                                step="1"
+                                value="0"
+                            >
+
+                        </div>
+
+
+                        <!-- Expiry -->
+
+                        <div class="form-group">
+
+                            <label for="medicineExpiry">
+                                Expiry Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="medicineExpiry"
+                                name="expiry_date"
+                            >
+
+                        </div>
+
+
+                        <!-- Supplier -->
+
+                        <div class="form-group">
+
+                            <label for="medicineSupplier">
+                                Supplier
+                            </label>
+
+                            <select
+                                id="medicineSupplier"
+                                name="supplier_id"
+                            >
+
+                                <option value="">
+                                    Select supplier
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Unit cost -->
+
+                        <div class="form-group">
+
+                            <label for="medicineCost">
+                                Unit Cost
+                            </label>
+
+                            <input
+                                type="number"
+                                id="medicineCost"
+                                name="unit_cost"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            id="addMedicineBtn"
+                        >
+                            Add Medicine
+                        </button>
+
+
+                        <button
+                            type="reset"
+                            class="btn btn-secondary"
+                            id="resetMedicineBtn"
+                        >
+                            Clear
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="message-box"
+                        id="medicineMessage"
+                        hidden
+                    ></div>
+
+                </form>
+
+            </section>
+
+
+            <!-- =================================================
+                 CURRENT INVENTORY
+                 ================================================= -->
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="page-eyebrow">
+                            INVENTORY
+                        </div>
+
+                        <h2>
+                            Current Medicine Inventory
+                        </h2>
+
+                        <p>
+                            Live inventory data from the MedSupply
+                            database.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        id="refreshInventoryBtn"
+                    >
+                        Refresh
+                    </button>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="data-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Medicine
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Stock
+                                </th>
+
+                                <th>
+                                    Minimum
+                                </th>
+
+                                <th>
+                                    Reserve
+                                </th>
+
+                                <th>
+                                    Criticality
+                                </th>
+
+                                <th>
+                                    Supplier
+                                </th>
+
+                                <th>
+                                    Expiry
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="inventoryTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="9"
+                                    class="empty-state"
+                                >
+                                    Loading inventory...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 FOOTER
+                 ================================================= -->
+
+            <footer class="footer">
+
+                <div>
+                    MedSupply Intelligence
+                </div>
+
+                <div>
+                    Admin & Inventory Management
+                </div>
+
+            </footer>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         ADMIN JAVASCRIPT
+         ===================================================== -->
+
+    <script src="/js/admin.js"></script>
+
+</body>
+
+</html>

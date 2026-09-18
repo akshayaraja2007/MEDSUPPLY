@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MedSupply Intelligence — Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- =========================================
+         SIDEBAR
+         ========================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">
+                MS
+            </div>
+
+            <div>
+                <div class="brand-title">
+                    MedSupply
+                </div>
+
+                <div class="brand-subtitle">
+                    Intelligence
+                </div>
+            </div>
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="/pages/dashboard.html"
+                class="nav-item active"
+            >
+                <span class="nav-icon">◈</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a
+                href="/pages/admin.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▣</span>
+                <span>Admin</span>
+            </a>
+
+            <a
+                href="/pages/billing.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▤</span>
+                <span>Billing</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>System Online</strong>
+                    <small>Healthcare Supply Chain</small>
+                </div>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================
+         MAIN CONTENT
+         ========================================= -->
+
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+                <div class="page-kicker">
+                    MEDICAL SUPPLY CHAIN
+                </div>
+
+                <h1>
+                    Intelligence Dashboard
+                </h1>
+
+                <p>
+                    Real-time inventory visibility,
+                    demand forecasting and procurement risk.
+                </p>
+            </div>
+
+
+            <div class="topbar-actions">
+
+                <button
+                    id="refreshDashboardBtn"
+                    class="btn btn-secondary"
+                    type="button"
+                >
+                    ↻ Refresh
+                </button>
+
+                <div
+                    id="dashboardStatus"
+                    class="connection-status"
+                >
+                    <span class="status-dot"></span>
+                    Connected
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================================
+             LOADING / MESSAGE
+             ========================================= -->
+
+        <div
+            id="dashboardLoading"
+            class="dashboard-message"
+            style="display:none;"
+        >
+            Loading intelligence data...
+        </div>
+
+        <div
+            id="dashboardMessage"
+            class="dashboard-message"
+            style="display:none;"
+        ></div>
+
+
+        <!-- =========================================
+             KPI CARDS
+             ========================================= -->
+
+        <section class="dashboard-grid kpi-grid">
+
+            <article class="kpi-card">
+
+                <div class="kpi-label">
+                    Total Medicines
+                </div>
+
+                <div
+                    id="totalMedicines"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-meta">
+                    Active inventory items
+                </div>
+
+            </article>
+
+
+            <article class="kpi-card">
+
+                <div class="kpi-label">
+                    Total Stock
+                </div>
+
+                <div
+                    id="totalStock"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-meta">
+                    Units currently available
+                </div>
+
+            </article>
+
+
+            <article class="kpi-card">
+
+                <div class="kpi-label">
+                    Critical Risks
+                </div>
+
+                <div
+                    id="criticalRisks"
+                    class="kpi-value danger-text"
+                >
+                    —
+                </div>
+
+                <div class="kpi-meta">
+                    Immediate attention required
+                </div>
+
+            </article>
+
+
+            <article class="kpi-card">
+
+                <div class="kpi-label">
+                    Procurement Need
+                </div>
+
+                <div
+                    id="procurementNeed"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-meta">
+                    Recommended units
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =========================================
+             RISK OVERVIEW
+             ========================================= -->
+
+        <section class="dashboard-grid overview-grid">
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <div class="section-kicker">
+                            RISK INTELLIGENCE
+                        </div>
+
+                        <h2>
+                            Supply Chain Risk
+                        </h2>
+
+                        <p>
+                            Medicines requiring attention based
+                            on inventory, demand and expiry signals.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="risk-summary-grid">
+
+                    <div class="risk-summary-card">
+                        <span class="risk-summary-label">
+                            Critical
+                        </span>
+
+                        <strong
+                            id="criticalRiskCount"
+                            class="risk-critical"
+                        >
+                            0
+                        </strong>
+                    </div>
+
+
+                    <div class="risk-summary-card">
+                        <span class="risk-summary-label">
+                            High
+                        </span>
+
+                        <strong
+                            id="highRiskCount"
+                            class="risk-high"
+                        >
+                            0
+                        </strong>
+                    </div>
+
+
+                    <div class="risk-summary-card">
+                        <span class="risk-summary-label">
+                            Warning
+                        </span>
+
+                        <strong
+                            id="warningRiskCount"
+                            class="risk-warning"
+                        >
+                            0
+                        </strong>
+                    </div>
+
+
+                    <div class="risk-summary-card">
+                        <span class="risk-summary-label">
+                            Normal
+                        </span>
+
+                        <strong
+                            id="normalRiskCount"
+                            class="risk-normal"
+                        >
+                            0
+                        </strong>
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- AI ENGINE STATUS -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <div class="section-kicker">
+                            AI ENGINE
+                        </div>
+
+                        <h2>
+                            Demand Intelligence
+                        </h2>
+
+                        <p>
+                            Forecast generated from recent
+                            consumption history.
+                        </p>
+                    </div>
+
+                    <span
+                        id="aiEngineStatus"
+                        class="badge badge-success"
+                    >
+                        ACTIVE
+                    </span>
+
+                </div>
+
+
+                <div class="ai-engine-metrics">
+
+                    <div>
+                        <span>Model</span>
+
+                        <strong id="forecastModel">
+                            —
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <span>Average Confidence</span>
+
+                        <strong id="averageConfidence">
+                            —
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <span>Forecast Horizon</span>
+
+                        <strong>
+                            7 Days
+                        </strong>
+                    </div>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =========================================
+             PRIORITY MEDICINES
+             ========================================= -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <div class="section-kicker">
+                        PRIORITY QUEUE
+                    </div>
+
+                    <h2>
+                        Medicines Requiring Attention
+                    </h2>
+
+                    <p>
+                        Ranked by current inventory and
+                        intelligence signals.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Stock</th>
+                            <th>Daily Demand</th>
+                            <th>Days of Cover</th>
+                            <th>Trend</th>
+                            <th>Risk</th>
+                            <th>Recommended Order</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="priorityMedicinesBody">
+
+                        <tr>
+                            <td
+                                colspan="7"
+                                class="table-empty"
+                            >
+                                Loading intelligence...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             INVENTORY + PROCUREMENT
+             ========================================= -->
+
+        <section class="dashboard-grid two-column-grid">
+
+            <!-- INVENTORY STATUS -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <div class="section-kicker">
+                            INVENTORY
+                        </div>
+
+                        <h2>
+                            Inventory Status
+                        </h2>
+
+                        <p>
+                            Current stock health across medicines.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="inventoryStatusList"
+                    class="inventory-status-list"
+                >
+
+                    <div class="inventory-status-item">
+
+                        <div>
+                            <strong>Normal</strong>
+                            <span>Healthy inventory</span>
+                        </div>
+
+                        <b id="inventoryNormalCount">
+                            0
+                        </b>
+
+                    </div>
+
+
+                    <div class="inventory-status-item">
+
+                        <div>
+                            <strong>Low</strong>
+                            <span>Below minimum stock</span>
+                        </div>
+
+                        <b id="inventoryLowCount">
+                            0
+                        </b>
+
+                    </div>
+
+
+                    <div class="inventory-status-item">
+
+                        <div>
+                            <strong>Critical</strong>
+                            <span>Below emergency reserve</span>
+                        </div>
+
+                        <b id="inventoryCriticalCount">
+                            0
+                        </b>
+
+                    </div>
+
+
+                    <div class="inventory-status-item">
+
+                        <div>
+                            <strong>Stockout Risk</strong>
+                            <span>Projected shortage</span>
+                        </div>
+
+                        <b id="inventoryStockoutCount">
+                            0
+                        </b>
+
+                    </div>
+
+
+                    <div class="inventory-status-item">
+
+                        <div>
+                            <strong>Expiring Soon</strong>
+                            <span>Expiry within risk window</span>
+                        </div>
+
+                        <b id="inventoryExpiringCount">
+                            0
+                        </b>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- PROCUREMENT -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <div class="section-kicker">
+                            PROCUREMENT
+                        </div>
+
+                        <h2>
+                            Recommended Actions
+                        </h2>
+
+                        <p>
+                            Intelligence-based replenishment plan.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="procurementList"
+                    class="procurement-list"
+                >
+
+                    <div class="table-empty">
+                        Loading procurement recommendations...
+                    </div>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =========================================
+             EXPIRY WATCH
+             ========================================= -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <div class="section-kicker">
+                        EXPIRY INTELLIGENCE
+                    </div>
+
+                    <h2>
+                        Expiry Watch
+                    </h2>
+
+                    <p>
+                        Inventory approaching its expiry date.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Expiry Date</th>
+                            <th>Days Remaining</th>
+                            <th>Current Stock</th>
+                            <th>Risk</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="expiryTableBody">
+
+                        <tr>
+                            <td
+                                colspan="5"
+                                class="table-empty"
+                            >
+                                No expiry data loaded.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             INTELLIGENCE PIPELINE
+             ========================================= -->
+
+        <section class="panel intelligence-pipeline-panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <div class="section-kicker">
+                        DECISION ENGINE
+                    </div>
+
+                    <h2>
+                        MedSupply Intelligence Pipeline
+                    </h2>
+
+                    <p>
+                        Operational data is transformed into
+                        actionable procurement intelligence.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="intelligence-pipeline">
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        01
+                    </div>
+
+                    <strong>
+                        Stock IN
+                    </strong>
+
+                    <span>
+                        Supplier invoice
+                    </span>
+
+                </div>
+
+
+                <div class="pipeline-arrow">
+                    →
+                </div>
+
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        02
+                    </div>
+
+                    <strong>
+                        Stock OUT
+                    </strong>
+
+                    <span>
+                        Pharmacy billing
+                    </span>
+
+                </div>
+
+
+                <div class="pipeline-arrow">
+                    →
+                </div>
+
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        03
+                    </div>
+
+                    <strong>
+                        AI Forecast
+                    </strong>
+
+                    <span>
+                        Demand prediction
+                    </span>
+
+                </div>
+
+
+                <div class="pipeline-arrow">
+                    →
+                </div>
+
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        04
+                    </div>
+
+                    <strong>
+                        Risk Engine
+                    </strong>
+
+                    <span>
+                        Stock + expiry risks
+                    </span>
+
+                </div>
+
+
+                <div class="pipeline-arrow">
+                    →
+                </div>
+
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        05
+                    </div>
+
+                    <strong>
+                        Procurement
+                    </strong>
+
+                    <span>
+                        Recommended quantity
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             FOOTER
+             ========================================= -->
+
+        <footer class="dashboard-footer">
+
+            <div>
+                MedSupply Intelligence
+            </div>
+
+            <div>
+                Healthcare Inventory & Procurement Intelligence
+            </div>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================
+     JAVASCRIPT
+     ========================================= -->
+
+<script src="/js/dashboard.js"></script>
+
+</body>
+</html>

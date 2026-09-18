@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="MedSupply Intelligence - Pharmacy Billing and Medicine Issue"
+    >
+
+    <title>Billing | MedSupply Intelligence</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+</head>
+
+<body>
+
+    <div class="app-shell">
+
+        <!-- =================================================
+             SIDEBAR
+             ================================================= -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+
+                <div class="brand-mark">
+                    MS
+                </div>
+
+                <div>
+                    <div class="brand-title">
+                        MedSupply
+                    </div>
+
+                    <div class="brand-subtitle">
+                        Intelligence
+                    </div>
+                </div>
+
+            </div>
+
+
+            <nav class="sidebar-nav">
+
+                <a
+                    href="/pages/dashboard.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">▦</span>
+                    <span>Dashboard</span>
+                </a>
+
+
+                <a
+                    href="/pages/admin.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">▣</span>
+                    <span>Admin</span>
+                </a>
+
+
+                <a
+                    href="/pages/billing.html"
+                    class="nav-item active"
+                >
+                    <span class="nav-icon">▤</span>
+                    <span>Billing</span>
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-bottom">
+
+                <div class="system-status">
+
+                    <span class="status-dot"></span>
+
+                    <div>
+                        <strong>System Online</strong>
+                        <small>MedSupply Core</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             MAIN CONTENT
+             ================================================= -->
+
+        <main class="main-content">
+
+            <!-- =================================================
+                 TOPBAR
+                 ================================================= -->
+
+            <header class="topbar">
+
+                <div>
+
+                    <div class="page-eyebrow">
+                        PHARMACY OPERATIONS
+                    </div>
+
+                    <h1>
+                        Medicine Billing
+                    </h1>
+
+                    <p class="page-description">
+                        Issue medicines to patients and automatically
+                        update inventory consumption.
+                    </p>
+
+                </div>
+
+
+                <div class="topbar-actions">
+
+                    <a
+                        href="/pages/dashboard.html"
+                        class="btn btn-secondary"
+                    >
+                        Dashboard
+                    </a>
+
+
+                    <a
+                        href="/pages/admin.html"
+                        class="btn btn-primary"
+                    >
+                        Admin
+                    </a>
+
+                </div>
+
+            </header>
+
+
+            <!-- =================================================
+                 OPERATION BANNER
+                 ================================================= -->
+
+            <section class="system-banner">
+
+                <div class="system-banner-icon">
+                    OUT
+                </div>
+
+                <div>
+
+                    <strong>
+                        Stock-out transaction
+                    </strong>
+
+                    <span>
+                        Every confirmed medicine issue decreases
+                        inventory and is recorded in consumption history
+                        for demand intelligence.
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 BILLING WORKSPACE
+                 ================================================= -->
+
+            <section class="billing-layout">
+
+                <!-- =================================================
+                     LEFT: BILL FORM
+                     ================================================= -->
+
+                <div>
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <div>
+
+                                <div class="page-eyebrow">
+                                    PATIENT
+                                </div>
+
+                                <h2>
+                                    Patient Information
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+
+                                <label for="patientName">
+                                    Patient Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="patientName"
+                                    placeholder="Enter patient name"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="patientId">
+                                    Patient ID
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="patientId"
+                                    placeholder="Optional patient ID"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="billReference">
+                                    Bill Reference
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="billReference"
+                                    placeholder="Optional reference number"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         MEDICINE ISSUE
+                         ================================================= -->
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <div>
+
+                                <div class="page-eyebrow">
+                                    MEDICINE ISSUE
+                                </div>
+
+                                <h2>
+                                    Medicines
+                                </h2>
+
+                                <p>
+                                    Select medicines and enter the quantity
+                                    issued to the patient.
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                id="addMedicineBtn"
+                            >
+                                + Add Medicine
+                            </button>
+
+                        </div>
+
+
+                        <!-- Medicine rows -->
+
+                        <div
+                            id="medicineRows"
+                            class="medicine-rows"
+                        >
+
+                            <!-- First row created by billing.js -->
+
+                        </div>
+
+
+                        <!-- Empty state -->
+
+                        <div
+                            id="medicineEmptyState"
+                            class="empty-state"
+                            hidden
+                        >
+
+                            No medicines added.
+                            Click "Add Medicine" to begin.
+
+                        </div>
+
+
+                        <!-- Stock warning -->
+
+                        <div
+                            id="stockWarning"
+                            class="message-box warning"
+                            hidden
+                        ></div>
+
+
+                        <!-- Billing message -->
+
+                        <div
+                            id="billingMessage"
+                            class="message-box"
+                            hidden
+                        ></div>
+
+
+                        <!-- Actions -->
+
+                        <div class="form-actions">
+
+                            <button
+                                type="button"
+                                class="btn btn-primary btn-large billing-submit"
+                                id="confirmBillBtn"
+                            >
+                                Confirm Medicine Issue
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                id="clearBillingBtn"
+                            >
+                                Clear
+                            </button>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         RECENT TRANSACTIONS
+                         ================================================= -->
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <div>
+
+                                <div class="page-eyebrow">
+                                    TRANSACTION HISTORY
+                                </div>
+
+                                <h2>
+                                    Recent Medicine Issues
+                                </h2>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                id="refreshBillsBtn"
+                            >
+                                Refresh
+                            </button>
+
+                        </div>
+
+
+                        <div class="table-wrapper">
+
+                            <table class="data-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Medicine
+                                        </th>
+
+                                        <th>
+                                            Type
+                                        </th>
+
+                                        <th>
+                                            Quantity
+                                        </th>
+
+                                        <th>
+                                            Reference
+                                        </th>
+
+                                        <th>
+                                            Date
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody id="billsTableBody">
+
+                                    <tr>
+
+                                        <td
+                                            colspan="5"
+                                            class="empty-state"
+                                        >
+                                            Loading transactions...
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+
+                <!-- =================================================
+                     RIGHT: BILL SUMMARY
+                     ================================================= -->
+
+                <aside class="billing-sidebar">
+
+                    <section class="card billing-summary-card">
+
+                        <div class="card-header">
+
+                            <div>
+
+                                <div class="page-eyebrow">
+                                    BILL SUMMARY
+                                </div>
+
+                                <h2>
+                                    Issue Summary
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="billing-summary">
+
+                            <div class="billing-summary-row">
+
+                                <span>
+                                    Medicines
+                                </span>
+
+                                <strong id="summaryMedicineCount">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                            <div class="billing-summary-row">
+
+                                <span>
+                                    Total Units
+                                </span>
+
+                                <strong id="summaryQuantity">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                            <div class="billing-summary-row">
+
+                                <span>
+                                    Estimated Value
+                                </span>
+
+                                <strong id="summaryValue">
+                                    ₹0.00
+                                </strong>
+
+                            </div>
+
+
+                            <div class="billing-summary-divider"></div>
+
+
+                            <div class="billing-summary-row billing-total">
+
+                                <span>
+                                    Stock Action
+                                </span>
+
+                                <strong>
+                                    STOCK OUT
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="billing-stock-status"
+                            id="billingStockStatus"
+                        >
+
+                            <span class="status-dot"></span>
+
+                            <div>
+
+                                <strong>
+                                    Inventory check
+                                </strong>
+
+                                <small>
+                                    Select medicines to validate stock.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         INTELLIGENCE PIPELINE
+                         ================================================= -->
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <div>
+
+                                <div class="page-eyebrow">
+                                    AI PIPELINE
+                                </div>
+
+                                <h2>
+                                    Data Flow
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mini-pipeline">
+
+                            <div class="mini-pipeline-step">
+
+                                <span>
+                                    01
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Patient Issue
+                                    </strong>
+
+                                    <small>
+                                        Medicine dispensed
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="mini-pipeline-line"></div>
+
+
+                            <div class="mini-pipeline-step">
+
+                                <span>
+                                    02
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Stock OUT
+                                    </strong>
+
+                                    <small>
+                                        Inventory updated
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="mini-pipeline-line"></div>
+
+
+                            <div class="mini-pipeline-step">
+
+                                <span>
+                                    03
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Consumption
+                                    </strong>
+
+                                    <small>
+                                        History recorded
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="mini-pipeline-line"></div>
+
+
+                            <div class="mini-pipeline-step">
+
+                                <span>
+                                    04
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        AI Forecast
+                                    </strong>
+
+                                    <small>
+                                        Demand updated
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         STOCK LEGEND
+                         ================================================= -->
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <div>
+
+                                <div class="page-eyebrow">
+                                    STOCK STATUS
+                                </div>
+
+                                <h2>
+                                    Inventory Rules
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="stock-rules">
+
+                            <div class="stock-rule">
+
+                                <span class="rule-indicator normal"></span>
+
+                                <div>
+
+                                    <strong>
+                                        Normal
+                                    </strong>
+
+                                    <small>
+                                        Stock above minimum level
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="stock-rule">
+
+                                <span class="rule-indicator low"></span>
+
+                                <div>
+
+                                    <strong>
+                                        Low
+                                    </strong>
+
+                                    <small>
+                                        Stock at or below minimum
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="stock-rule">
+
+                                <span class="rule-indicator critical"></span>
+
+                                <div>
+
+                                    <strong>
+                                        Critical
+                                    </strong>
+
+                                    <small>
+                                        Stock at emergency reserve
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="stock-rule">
+
+                                <span class="rule-indicator stockout"></span>
+
+                                <div>
+
+                                    <strong>
+                                        Stockout Risk
+                                    </strong>
+
+                                    <small>
+                                        No available inventory
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                </aside>
+
+            </section>
+
+
+            <!-- =================================================
+                 FOOTER
+                 ================================================= -->
+
+            <footer class="footer">
+
+                <div>
+                    MedSupply Intelligence
+                </div>
+
+                <div>
+                    Pharmacy Billing & Consumption Tracking
+                </div>
+
+            </footer>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         BILLING JAVASCRIPT
+         ===================================================== -->
+
+    <script src="/js/billing.js"></script>
+
+</body>
+
+</html>
