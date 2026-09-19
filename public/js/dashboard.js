@@ -8,6 +8,7 @@ const API_BASE =
 
 let intelligenceData = [];
 let dashboardLoaded = false;
+let intelligenceStatistics = null;
 
 
 /* =========================================
@@ -116,9 +117,7 @@ function formatDate(value) {
             date.getTime()
         )
     ) {
-
         return value;
-
     }
 
     return date.toLocaleDateString(
@@ -246,17 +245,13 @@ function riskClass(status) {
         normalized === "CRITICAL" ||
         normalized === "STOCKOUT_RISK"
     ) {
-
         return "risk-critical";
-
     }
 
     if (
         normalized === "HIGH"
     ) {
-
         return "risk-high";
-
     }
 
     if (
@@ -264,9 +259,7 @@ function riskClass(status) {
         normalized === "LOW" ||
         normalized === "EXPIRING_SOON"
     ) {
-
         return "risk-warning";
-
     }
 
     return "risk-normal";
@@ -337,17 +330,13 @@ function trendClass(trend) {
     if (
         normalized.includes("INCREAS")
     ) {
-
         return "trend-up";
-
     }
 
     if (
         normalized.includes("DECREAS")
     ) {
-
         return "trend-down";
-
     }
 
     return "trend-stable";
@@ -365,17 +354,13 @@ function trendLabel(trend) {
     if (
         normalized.includes("INCREAS")
     ) {
-
         return "Increasing";
-
     }
 
     if (
         normalized.includes("DECREAS")
     ) {
-
         return "Decreasing";
-
     }
 
     return "Stable";
@@ -450,10 +435,8 @@ function hideMessage() {
         $("dashboardMessage");
 
     if (element) {
-
         element.style.display =
             "none";
-
     }
 
 }
@@ -474,7 +457,9 @@ async function fetchIntelligence() {
                 headers: {
                     "Accept":
                         "application/json"
-                }
+                },
+
+                cache: "no-store"
             }
         );
 
@@ -496,13 +481,11 @@ async function fetchIntelligence() {
     if (!response.ok) {
 
         throw new Error(
-
             result.error
             ||
             result.message
             ||
             `Request failed with status ${response.status}.`
-
         );
 
     }
@@ -510,13 +493,11 @@ async function fetchIntelligence() {
     if (!result.success) {
 
         throw new Error(
-
             result.error
             ||
             result.message
             ||
             "Intelligence engine failed."
-
         );
 
     }
@@ -528,56 +509,69 @@ async function fetchIntelligence() {
 
 /* =========================================
    DATA NORMALIZATION
+   IMPORTANT:
+   API STRUCTURE IS:
+
+   {
+       item: {...},
+       forecast: {...},
+       risk: {...},
+       procurement: {...}
+   }
    ========================================= */
 
-function normalizeIntelligenceItem(item) {
+function normalizeIntelligenceItem(record) {
+
+    const item =
+        record.item
+        ||
+        {};
 
     const forecast =
-        item.forecast
-        ||
-        item.demand
+        record.forecast
         ||
         {};
 
     const risk =
-        item.risk
+        record.risk
         ||
         {};
 
     const procurement =
-        item.procurement
+        record.procurement
         ||
         {};
+
+    /* -------------------------------------
+       STOCK
+       ------------------------------------- */
 
     const stock =
         Number(
             item.current_stock ??
-            item.stock ??
             0
         );
+
+
+    /* -------------------------------------
+       DAILY DEMAND
+       ------------------------------------- */
 
     const dailyDemand =
         Number(
             forecast.predicted_daily ??
-            forecast.predictedDemand ??
-            item.predicted_daily ??
-            item.daily_demand ??
-            item.avg_daily_demand ??
+            risk.daily_demand ??
             0
         );
 
-    const leadTime =
-        Number(
-            item.lead_time_days ??
-            procurement.lead_time_days ??
-            0
-        );
+
+    /* -------------------------------------
+       DAYS OF COVER
+       ------------------------------------- */
 
     let daysOfCover =
         Number(
-            risk.days_of_cover ??
-            risk.daysOfCover ??
-            item.days_of_cover
+            risk.days_of_cover
         );
 
     if (
@@ -603,67 +597,104 @@ function normalizeIntelligenceItem(item) {
 
     }
 
+
+    /* -------------------------------------
+       RISK
+       ------------------------------------- */
+
     const riskLevel =
-        risk.severity
+        risk.overall_risk
         ||
-        risk.risk_level
-        ||
-        risk.status
-        ||
-        item.status
+        risk.overall_severity
         ||
         "NORMAL";
 
+
+    /* -------------------------------------
+       RECOMMENDED PROCUREMENT
+       ------------------------------------- */
+
     const recommendedOrder =
         Number(
-            procurement.recommended_quantity ??
-            procurement.recommendedQuantity ??
-            procurement.quantity ??
-            item.recommended_order ??
-            item.recommended_quantity ??
+            procurement.recommended_quantity
+            ??
             0
         );
+
+
+    /* -------------------------------------
+       EXPIRY
+       ------------------------------------- */
 
     const expiryDate =
         item.expiry_date
         ||
-        item.expiryDate
-        ||
         null;
+
+
+    /* -------------------------------------
+       FORECAST
+       ------------------------------------- */
 
     const forecastModel =
         forecast.model
         ||
-        item.model
-        ||
-        "Python Demand Intelligence";
+        "Weighted Moving Average + Trend";
+
 
     const confidence =
         Number(
-            forecast.confidence ??
-            item.confidence ??
+            forecast.confidence
+            ??
             0
         );
 
+
+    /* -------------------------------------
+       NORMALIZED OBJECT
+       ------------------------------------- */
+
     return {
 
-        ...item,
+        /* Raw data */
+        ...record,
 
+        /* Inventory */
         id:
-            item.id ??
-            item.item_id,
+            item.id,
+
+        item_id:
+            item.id,
 
         name:
             item.name
             ||
-            item.medicine_name
+            risk.medicine_name
+            ||
+            procurement.medicine_name
+            ||
+            "Unknown Medicine",
+
+        medicine_name:
+            item.name
+            ||
+            risk.medicine_name
+            ||
+            procurement.medicine_name
             ||
             "Unknown Medicine",
 
         category:
             item.category
             ||
+            procurement.category
+            ||
             "—",
+
+        unit:
+            item.unit
+            ||
+            "units",
 
         current_stock:
             stock,
@@ -671,19 +702,19 @@ function normalizeIntelligenceItem(item) {
         minimum_stock:
             Number(
                 item.minimum_stock ??
-                item.min_stock ??
                 0
             ),
 
         emergency_reserve:
             Number(
                 item.emergency_reserve ??
-                item.reserve ??
                 0
             ),
 
         criticality:
             item.criticality
+            ||
+            risk.criticality
             ||
             "MEDIUM",
 
@@ -695,36 +726,63 @@ function normalizeIntelligenceItem(item) {
             ||
             "NORMAL",
 
+        supplier_id:
+            item.supplier_id
+            ??
+            procurement.supplier_id
+            ??
+            null,
+
+        supplier_name:
+            item.supplier_name
+            ||
+            procurement.supplier_name
+            ||
+            "Supplier not assigned",
+
+        lead_time_days:
+            Number(
+                item.lead_time_days
+                ??
+                procurement.lead_time_days
+                ??
+                0
+            ),
+
+        unit_cost:
+            Number(
+                item.unit_cost
+                ??
+                procurement.unit_cost
+                ??
+                0
+            ),
+
+
+        /* Forecast */
+
         daily_demand:
             dailyDemand,
+
+        predicted_daily:
+            Number(
+                forecast.predicted_daily
+                ??
+                0
+            ),
 
         days_of_cover:
             daysOfCover,
 
-        lead_time_days:
-            leadTime,
-
-        risk_level:
-            riskLevel,
-
-        risk_message:
-            risk.message
-            ||
-            item.risk_message
-            ||
-            "",
-
         trend:
             forecast.trend
-            ||
-            item.trend
             ||
             "STABLE",
 
         trend_change:
             Number(
-                forecast.trend_change ??
-                item.trend_change ??
+                forecast.trend_change
+                ??
                 0
             ),
 
@@ -734,15 +792,109 @@ function normalizeIntelligenceItem(item) {
         forecast_model:
             forecastModel,
 
+        forecast_data:
+            forecast.forecast
+            ||
+            [],
+
+
+        /* Risk */
+
+        risk_level:
+            riskLevel,
+
+        overall_risk:
+            risk.overall_risk
+            ||
+            "NORMAL",
+
+        overall_severity:
+            risk.overall_severity
+            ||
+            "INFO",
+
+        stock_level:
+            risk.stock_level
+            ||
+            "NORMAL",
+
+        stockout_risk:
+            Boolean(
+                risk.stockout_risk
+            ),
+
+        low_stock_risk:
+            Boolean(
+                risk.low_stock_risk
+            ),
+
+        expiry_risk:
+            Boolean(
+                risk.expiry_risk
+            ),
+
+        days_to_expiry:
+            risk.days_to_expiry,
+
+        risk_message:
+            (
+                risk.reasons
+                &&
+                risk.reasons.length
+            )
+                ? risk.reasons.join(" ")
+                : "",
+
+        risk_reasons:
+            risk.reasons
+            ||
+            [],
+
+        anomaly:
+            risk.anomaly
+            ||
+            null,
+
+
+        /* Procurement */
+
         recommended_order:
             recommendedOrder,
+
+        recommended_quantity:
+            recommendedOrder,
+
+        procurement_required:
+            Boolean(
+                procurement.procurement_required
+            ),
+
+        procurement_priority:
+            procurement.priority
+            ||
+            "LOW",
 
         procurement_reason:
             procurement.reason
             ||
-            item.procurement_reason
+            "",
+
+        procurement_reasons:
+            procurement.reasons
             ||
-            ""
+            [],
+
+        estimated_cost:
+            Number(
+                procurement.estimated_cost
+                ??
+                0
+            ),
+
+        expected_delivery_date:
+            procurement.expected_delivery_date
+            ||
+            null
 
     };
 
@@ -755,8 +907,27 @@ function normalizeIntelligenceItem(item) {
 
 function calculateKpis(items) {
 
+    const statistics =
+        intelligenceStatistics
+        ||
+        {};
+
+
+    /* -------------------------------------
+       TOTAL MEDICINES
+       ------------------------------------- */
+
     const totalMedicines =
-        items.length;
+        Number(
+            statistics.total_items
+            ??
+            items.length
+        );
+
+
+    /* -------------------------------------
+       TOTAL STOCK
+       ------------------------------------- */
 
     const totalStock =
         items.reduce(
@@ -766,56 +937,57 @@ function calculateKpis(items) {
             ) =>
                 sum +
                 Number(
-                    item.current_stock ||
-                    0
+                    item.current_stock || 0
                 ),
             0
         );
+
+
+    /* -------------------------------------
+       CRITICAL RISKS
+
+       Prefer backend statistics because
+       backend risk engine is authoritative.
+       ------------------------------------- */
 
     const criticalRisks =
-        items.filter(
-            item => {
-
-                const risk =
+        Number(
+            statistics.critical_items
+            ??
+            items.filter(
+                item =>
                     normalizeStatus(
-                        item.risk_level
-                    );
-
-                const status =
-                    normalizeStatus(
-                        item.status
-                    );
-
-                return (
-
-                    risk === "CRITICAL"
-                    ||
-                    risk === "STOCKOUT_RISK"
-                    ||
-                    status === "CRITICAL"
-                    ||
-                    status === "STOCKOUT_RISK"
-
-                );
-
-            }
-        ).length;
-
-
-    const procurementNeed =
-        items.reduce(
-            (
-                sum,
-                item
-            ) =>
-                sum +
-                Number(
-                    item.recommended_order ||
-                    0
-                ),
-            0
+                        item.overall_risk
+                    ) === "CRITICAL"
+            ).length
         );
 
+
+    /* -------------------------------------
+       PROCUREMENT NEED
+       ------------------------------------- */
+
+    const procurementNeed =
+        Number(
+            statistics.total_recommended_units
+            ??
+            items.reduce(
+                (
+                    sum,
+                    item
+                ) =>
+                    sum +
+                    Number(
+                        item.recommended_order || 0
+                    ),
+                0
+            )
+        );
+
+
+    /* -------------------------------------
+       AVERAGE CONFIDENCE
+       ------------------------------------- */
 
     const confidenceValues =
         items
@@ -847,12 +1019,17 @@ function calculateKpis(items) {
             : 0;
 
 
+    /* -------------------------------------
+       UPDATE DOM
+       ------------------------------------- */
+
     setText(
         "totalMedicines",
         formatInteger(
             totalMedicines
         )
     );
+
 
     setText(
         "totalStock",
@@ -861,6 +1038,7 @@ function calculateKpis(items) {
         )
     );
 
+
     setText(
         "criticalRisks",
         formatInteger(
@@ -868,12 +1046,14 @@ function calculateKpis(items) {
         )
     );
 
+
     setText(
         "procurementNeed",
         formatInteger(
             procurementNeed
         )
     );
+
 
     setText(
         "averageConfidence",
@@ -883,13 +1063,17 @@ function calculateKpis(items) {
     );
 
 
+    /* -------------------------------------
+       FORECAST MODEL
+       ------------------------------------- */
+
     const model =
         items.find(
             item =>
                 item.forecast_model
         )?.forecast_model
         ||
-        "Python Demand Intelligence";
+        "Weighted Moving Average + Trend";
 
 
     setText(
@@ -906,64 +1090,60 @@ function calculateKpis(items) {
 
 function calculateRiskSummary(items) {
 
-    let critical = 0;
-    let high = 0;
-    let warning = 0;
-    let normal = 0;
+    const statistics =
+        intelligenceStatistics
+        ||
+        {};
 
 
-    items.forEach(
-        item => {
+    /*
+       Backend statistics are used first.
+       This exactly matches the intelligence
+       engine's risk classification.
+    */
 
-            const risk =
-                normalizeStatus(
-                    item.risk_level
-                );
-
-            const status =
-                normalizeStatus(
-                    item.status
-                );
+    const critical =
+        Number(
+            statistics.critical_items
+            ??
+            0
+        );
 
 
-            if (
-                risk === "CRITICAL"
-                ||
-                risk === "STOCKOUT_RISK"
-                ||
-                status === "CRITICAL"
-                ||
-                status === "STOCKOUT_RISK"
-            ) {
+    const high =
+        Number(
+            statistics.high_risk_items
+            ??
+            items.filter(
+                item =>
+                    normalizeStatus(
+                        item.overall_risk
+                    ) === "HIGH"
+            ).length
+        );
 
-                critical++;
 
-            } else if (
-                risk === "HIGH"
-            ) {
+    const warning =
+        Number(
+            statistics.warning_items
+            ??
+            items.filter(
+                item =>
+                    normalizeStatus(
+                        item.overall_risk
+                    ) === "WARNING"
+            ).length
+        );
 
-                high++;
 
-            } else if (
-                risk === "WARNING"
-                ||
-                risk === "LOW"
-                ||
-                status === "LOW"
-                ||
-                status === "EXPIRING_SOON"
-            ) {
-
-                warning++;
-
-            } else {
-
-                normal++;
-
-            }
-
-        }
-    );
+    const normal =
+        Math.max(
+            items.length -
+            critical -
+            high -
+            warning,
+            0
+        );
 
 
     setText(
@@ -971,15 +1151,18 @@ function calculateRiskSummary(items) {
         critical
     );
 
+
     setText(
         "highRiskCount",
         high
     );
 
+
     setText(
         "warningRiskCount",
         warning
     );
+
 
     setText(
         "normalRiskCount",
@@ -1011,35 +1194,96 @@ function calculateInventoryStatus(items) {
                 );
 
 
+            const risk =
+                normalizeStatus(
+                    item.overall_risk
+                );
+
+
+            const daysToExpiry =
+                Number(
+                    item.days_to_expiry
+                );
+
+
+            /*
+               Stockout status
+            */
+
             if (
                 status === "STOCKOUT_RISK"
+                ||
+                item.stockout_risk
             ) {
 
                 stockout++;
 
-            } else if (
+                return;
+
+            }
+
+
+            /*
+               Critical inventory
+            */
+
+            if (
                 status === "CRITICAL"
             ) {
 
                 critical++;
 
-            } else if (
+                return;
+
+            }
+
+
+            /*
+               Low inventory
+            */
+
+            if (
                 status === "LOW"
+                ||
+                item.low_stock_risk
             ) {
 
                 low++;
 
-            } else if (
-                status === "EXPIRING_SOON"
+                return;
+
+            }
+
+
+            /*
+               Expiry risk
+
+               Only classify as expiry here if
+               there is no stock-level issue.
+            */
+
+            if (
+                item.expiry_risk
+                ||
+                (
+                    Number.isFinite(daysToExpiry)
+                    &&
+                    daysToExpiry <= 30
+                )
             ) {
 
                 expiring++;
 
-            } else {
-
-                normal++;
+                return;
 
             }
+
+
+            /*
+               Normal
+            */
+
+            normal++;
 
         }
     );
@@ -1050,20 +1294,24 @@ function calculateInventoryStatus(items) {
         normal
     );
 
+
     setText(
         "inventoryLowCount",
         low
     );
+
 
     setText(
         "inventoryCriticalCount",
         critical
     );
 
+
     setText(
         "inventoryStockoutCount",
         stockout
     );
+
 
     setText(
         "inventoryExpiringCount",
@@ -1097,10 +1345,31 @@ function renderPriorityMedicines(items) {
                             item.status
                         );
 
+
                     const risk =
                         normalizeStatus(
-                            item.risk_level
+                            item.overall_risk
                         );
+
+
+                    const recommended =
+                        Number(
+                            item.recommended_order ||
+                            0
+                        );
+
+
+                    const days =
+                        Number(
+                            item.days_of_cover
+                        );
+
+
+                    const leadTime =
+                        Number(
+                            item.lead_time_days
+                        );
+
 
                     return (
 
@@ -1108,16 +1377,14 @@ function renderPriorityMedicines(items) {
                         ||
                         risk !== "NORMAL"
                         ||
-                        Number(
-                            item.recommended_order ||
-                            0
-                        ) > 0
+                        recommended > 0
                         ||
-                        Number(
-                            item.days_of_cover
-                        ) <=
-                        Number(
-                            item.lead_time_days
+                        (
+                            Number.isFinite(days)
+                            &&
+                            leadTime > 0
+                            &&
+                            days <= leadTime
                         )
 
                     );
@@ -1182,6 +1449,7 @@ function renderPriorityMedicines(items) {
                         Number(
                             item.days_of_cover
                         );
+
 
                     const daysText =
                         Number.isFinite(days)
@@ -1260,7 +1528,7 @@ function renderPriorityMedicines(items) {
                             <td>
 
                                 ${riskBadge(
-                                    item.risk_level
+                                    item.overall_risk
                                 )}
 
                             </td>
@@ -1293,6 +1561,10 @@ function renderPriorityMedicines(items) {
 }
 
 
+/* =========================================
+   PRIORITY SCORE
+   ========================================= */
+
 function getPriorityScore(item) {
 
     const status =
@@ -1300,10 +1572,12 @@ function getPriorityScore(item) {
             item.status
         );
 
+
     const risk =
         normalizeStatus(
-            item.risk_level
+            item.overall_risk
         );
+
 
     let score = 0;
 
@@ -1312,6 +1586,8 @@ function getPriorityScore(item) {
         status === "STOCKOUT_RISK"
         ||
         risk === "STOCKOUT_RISK"
+        ||
+        item.stockout_risk
     ) {
 
         score += 100;
@@ -1345,6 +1621,8 @@ function getPriorityScore(item) {
         risk === "LOW"
         ||
         risk === "WARNING"
+        ||
+        item.low_stock_risk
     ) {
 
         score += 40;
@@ -1353,7 +1631,7 @@ function getPriorityScore(item) {
 
 
     if (
-        status === "EXPIRING_SOON"
+        item.expiry_risk
     ) {
 
         score += 30;
@@ -1365,6 +1643,7 @@ function getPriorityScore(item) {
         Number(
             item.days_of_cover
         );
+
 
     const leadTime =
         Number(
@@ -1385,6 +1664,7 @@ function getPriorityScore(item) {
             score += 50;
 
         }
+
 
         if (
             days <=
@@ -1479,8 +1759,6 @@ function renderProcurement(items) {
 
                     const supplier =
                         item.supplier_name
-                        ||
-                        item.supplier
                         ||
                         "Supplier not assigned";
 
@@ -1760,6 +2038,24 @@ function updateAiStatus(items) {
 
 function renderDashboard(result) {
 
+    /*
+       Save backend statistics.
+
+       Example:
+
+       total_items: 21
+       critical_items: 4
+       warning_items: 4
+       procurement_required: 8
+       total_recommended_units: 3462
+    */
+
+    intelligenceStatistics =
+        result.statistics
+        ||
+        null;
+
+
     const rawData =
         Array.isArray(
             result.data
@@ -1768,35 +2064,76 @@ function renderDashboard(result) {
             : [];
 
 
+    /*
+       IMPORTANT FIX
+
+       Convert:
+
+       {
+           item: {},
+           forecast: {},
+           risk: {},
+           procurement: {}
+       }
+
+       into the flat structure used
+       by the dashboard UI.
+    */
+
     intelligenceData =
         rawData.map(
             normalizeIntelligenceItem
         );
 
 
+    console.log(
+        "MEDSUPPLY INTELLIGENCE:",
+        {
+            statistics:
+                intelligenceStatistics,
+
+            records:
+                intelligenceData.length,
+
+            data:
+                intelligenceData
+        }
+    );
+
+
+    /* -------------------------------------
+       RENDER ALL SECTIONS
+       ------------------------------------- */
+
     calculateKpis(
         intelligenceData
     );
+
 
     calculateRiskSummary(
         intelligenceData
     );
 
+
     calculateInventoryStatus(
         intelligenceData
     );
+
 
     renderPriorityMedicines(
         intelligenceData
     );
 
+
     renderProcurement(
         intelligenceData
     );
 
+
     renderExpiryWatch(
         intelligenceData
     );
+
 
     updateAiStatus(
         intelligenceData
@@ -1806,6 +2143,10 @@ function renderDashboard(result) {
     dashboardLoaded =
         true;
 
+
+    /* -------------------------------------
+       UPDATE CONNECTION STATUS
+       ------------------------------------- */
 
     const status =
         $("dashboardStatus");
@@ -1841,6 +2182,7 @@ async function loadDashboard() {
     const loading =
         $("dashboardLoading");
 
+
     const refreshButton =
         $("refreshDashboardBtn");
 
@@ -1869,9 +2211,11 @@ async function loadDashboard() {
         const result =
             await fetchIntelligence();
 
+
         renderDashboard(
             result
         );
+
 
     } catch (error) {
 
@@ -1882,13 +2226,10 @@ async function loadDashboard() {
 
 
         showMessage(
-
             error.message
             ||
             "Unable to load dashboard intelligence.",
-
             "error"
-
         );
 
 
