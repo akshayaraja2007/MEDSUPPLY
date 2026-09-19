@@ -18,6 +18,9 @@
    GLOBAL STATE
    ========================================================= */
 
+const API_BASE =
+    "https://medsupply-oegb.onrender.com/api";
+
 let medicines = [];
 
 let suppliers = [];
@@ -431,8 +434,7 @@ function updateSelectedFileUI() {
 
     const sizeMB =
         (
-            selectedInvoiceFile.size
-            /
+            selectedInvoiceFile.size /
             (1024 * 1024)
         ).toFixed(2);
 
@@ -606,7 +608,7 @@ async function loadMedicines() {
 
         const response =
             await fetch(
-                "/api/medicines"
+                `${API_BASE}/medicines`
             );
 
 
@@ -687,7 +689,7 @@ async function loadSuppliers() {
 
         const response =
             await fetch(
-                "/api/medicines/suppliers"
+                `${API_BASE}/medicines/suppliers`
             );
 
 
@@ -766,12 +768,8 @@ function updateSupplierSelectors() {
                 select.value;
 
 
-            const isInvoiceSelector =
-                select.id ===
-                "supplierSelect";
-
-
-            select.innerHTML = "";
+            select.innerHTML =
+                "";
 
 
             const defaultOption =
@@ -785,9 +783,7 @@ function updateSupplierSelectors() {
 
 
             defaultOption.textContent =
-                isInvoiceSelector
-                    ? "Select supplier"
-                    : "Select supplier";
+                "Select supplier";
 
 
             select.appendChild(
@@ -883,6 +879,7 @@ function renderInventory() {
                     colspan="9"
                     class="empty-state"
                 >
+
                     No medicines found.
 
                 </td>
@@ -1090,7 +1087,7 @@ async function scanInvoice() {
         const response =
             await fetch(
 
-                "/api/invoices/extract",
+                `${API_BASE}/invoices/extract`,
 
                 {
 
@@ -1268,13 +1265,10 @@ function renderOcrResult(
 
 
     setText(
-
         "itemsDetectedDisplay",
-
         extracted.items?.length
         ||
         0
-
     );
 
 
@@ -1497,10 +1491,12 @@ function renderExtractedItems() {
 
 
     if (
-        !extractedInvoice ||
+        !extractedInvoice
+        ||
         !Array.isArray(
             extractedInvoice.items
-        ) ||
+        )
+        ||
         extractedInvoice.items.length === 0
     ) {
 
@@ -1512,6 +1508,7 @@ function renderExtractedItems() {
                     colspan="7"
                     class="empty-state"
                 >
+
                     No medicines detected by OCR.
 
                 </td>
@@ -1546,7 +1543,8 @@ function renderExtractedItems() {
                     */
 
                     if (
-                        !item.medicine_id &&
+                        !item.medicine_id
+                        &&
                         matched
                     ) {
 
@@ -1613,7 +1611,8 @@ function renderExtractedItems() {
 
                                     ${medicines
                                         .map(
-                                            medicine => `
+                                            medicine =>
+                                                `
 
                                                 <option
                                                     value="${medicine.id}"
@@ -1628,9 +1627,11 @@ function renderExtractedItems() {
                                                             : ""
                                                     }
                                                 >
+
                                                     ${escapeHtml(
                                                         medicine.name
                                                     )}
+
                                                 </option>
 
                                             `
@@ -1643,29 +1644,36 @@ function renderExtractedItems() {
 
 
                             <td>
+
                                 ${escapeHtml(
                                     item.batch_number
                                     ||
                                     "—"
                                 )}
+
                             </td>
 
 
                             <td>
+
                                 ${formatNumber(
                                     item.quantity
                                 )}
+
                             </td>
 
 
                             <td>
+
                                 ${formatDate(
                                     item.expiry_date
                                 )}
+
                             </td>
 
 
                             <td>
+
                                 ${
                                     item.unit_cost !== null &&
                                     item.unit_cost !== undefined
@@ -1674,6 +1682,7 @@ function renderExtractedItems() {
                                         )
                                         : "—"
                                 }
+
                             </td>
 
 
@@ -1751,7 +1760,8 @@ function handleMedicineMatch(
 
 
     if (
-        !extractedInvoice ||
+        !extractedInvoice
+        ||
         !extractedInvoice.items[index]
     ) {
 
@@ -1762,10 +1772,10 @@ function handleMedicineMatch(
 
     const medicineId =
         select.value
-        ? Number(
-            select.value
-        )
-        : null;
+            ? Number(
+                select.value
+            )
+            : null;
 
 
     extractedInvoice.items[index]
@@ -1940,10 +1950,12 @@ function updateConfirmationSummary() {
 async function confirmInvoice() {
 
     if (
-        !extractedInvoice ||
+        !extractedInvoice
+        ||
         !Array.isArray(
             extractedInvoice.items
-        ) ||
+        )
+        ||
         extractedInvoice.items.length === 0
     ) {
 
@@ -2011,7 +2023,6 @@ async function confirmInvoice() {
        Supplier is recommended but not mandatory
        because the database allows NULL supplier_id.
     */
-
 
     const items = [];
 
@@ -2127,8 +2138,10 @@ async function confirmInvoice() {
         confirmButton.disabled =
             true;
 
+
         confirmButton.dataset.originalText =
             confirmButton.innerText;
+
 
         confirmButton.innerText =
             "Confirming Invoice...";
@@ -2145,7 +2158,7 @@ async function confirmInvoice() {
         const response =
             await fetch(
 
-                "/api/invoices/confirm",
+                `${API_BASE}/invoices/confirm`,
 
                 {
 
@@ -2298,6 +2311,7 @@ async function confirmInvoice() {
 
             confirmButton.disabled =
                 false;
+
 
             confirmButton.innerText =
                 confirmButton.dataset.originalText
@@ -2484,8 +2498,10 @@ async function addMedicine(
         submitButton.disabled =
             true;
 
+
         submitButton.dataset.originalText =
             submitButton.innerText;
+
 
         submitButton.innerText =
             "Adding...";
@@ -2498,7 +2514,7 @@ async function addMedicine(
         const response =
             await fetch(
 
-                "/api/medicines",
+                `${API_BASE}/medicines`,
 
                 {
 
@@ -2620,6 +2636,7 @@ async function addMedicine(
             submitButton.disabled =
                 false;
 
+
             submitButton.innerText =
                 submitButton.dataset.originalText
                 ||
@@ -2698,7 +2715,9 @@ function resetScanner() {
         id => {
 
             const element =
-                getElement(id);
+                getElement(
+                    id
+                );
 
 
             if (element) {
@@ -2726,7 +2745,9 @@ function resetScanner() {
         id => {
 
             const element =
-                getElement(id);
+                getElement(
+                    id
+                );
 
 
             if (element) {
@@ -2763,6 +2784,7 @@ function resetScanner() {
                     colspan="7"
                     class="empty-state"
                 >
+
                     No extracted medicines yet.
 
                 </td>
@@ -2796,7 +2818,9 @@ function setText(
 ) {
 
     const element =
-        getElement(id);
+        getElement(
+            id
+        );
 
 
     if (element) {
@@ -2823,7 +2847,11 @@ function formatNumber(
         );
 
 
-    if (!Number.isFinite(number)) {
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
 
         return "0";
 
@@ -2851,7 +2879,11 @@ function formatCurrency(
         );
 
 
-    if (!Number.isFinite(number)) {
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
 
         return "₹0.00";
 
@@ -3048,7 +3080,7 @@ function escapeHtml(
 
 
 /* =========================================================
-   DEBUG HELPER
+   PUBLIC DEBUG API
    ========================================================= */
 
 window.MedSupplyAdmin = {

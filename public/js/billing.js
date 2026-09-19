@@ -17,6 +17,9 @@
    GLOBAL STATE
    ========================================================= */
 
+const API_BASE =
+    "https://medsupply-oegb.onrender.com/api";
+
 let medicines = [];
 
 let billingRows = [];
@@ -154,7 +157,7 @@ async function loadMedicines() {
 
         const response =
             await fetch(
-                "/api/medicines"
+                `${API_BASE}/medicines`
             );
 
 
@@ -198,6 +201,7 @@ async function loadMedicines() {
 
         updateBillingSummary();
 
+
     } catch (error) {
 
         console.error(
@@ -239,13 +243,14 @@ function addMedicineRow(
 
 
     if (!container) {
+
         return;
+
     }
 
 
     const rowId =
-        Date.now()
-        +
+        Date.now() +
         Math.floor(
             Math.random() * 10000
         );
@@ -306,7 +311,9 @@ function renderMedicineRows() {
 
 
     if (!container) {
+
         return;
+
     }
 
 
@@ -383,7 +390,6 @@ function renderMedicineRows() {
                 );
 
             }
-
         );
 
 
@@ -475,6 +481,7 @@ function createMedicineRowHtml(
         stockClass =
             "stock-danger";
 
+
         stockText =
             "OUT OF STOCK";
 
@@ -485,6 +492,7 @@ function createMedicineRowHtml(
 
         stockClass =
             "stock-danger";
+
 
         stockText =
             `Insufficient stock: ${formatNumber(stock)} available`;
@@ -651,7 +659,9 @@ function handleMedicineChange(
 
 
     if (!row) {
+
         return;
+
     }
 
 
@@ -697,7 +707,9 @@ function handleQuantityChange(
 
 
     if (!row) {
+
         return;
+
     }
 
 
@@ -751,15 +763,15 @@ function updateRowPreview(
 
 
     if (!row) {
+
         return;
+
     }
 
 
     const domRow =
         document.querySelector(
-
             `.billing-medicine-row[data-row-id="${rowId}"]`
-
         );
 
 
@@ -1098,9 +1110,7 @@ function updateStockPreview() {
 
 
             warnings.push(
-
                 `${medicine.name}: only ${formatNumber(stock)} available.`
-
             );
 
         }
@@ -1294,7 +1304,9 @@ function updateBillingSummary() {
 
 
         if (!medicine) {
+
             continue;
+
         }
 
 
@@ -1577,8 +1589,10 @@ async function confirmMedicineIssue() {
         confirmButton.disabled =
             true;
 
+
         confirmButton.dataset.originalText =
             confirmButton.innerText;
+
 
         confirmButton.innerText =
             "Processing...";
@@ -1591,7 +1605,7 @@ async function confirmMedicineIssue() {
         const response =
             await fetch(
 
-                "/api/billing",
+                `${API_BASE}/billing`,
 
                 {
 
@@ -1728,6 +1742,7 @@ async function confirmMedicineIssue() {
             confirmButton.disabled =
                 false;
 
+
             confirmButton.innerText =
                 confirmButton.dataset.originalText
                 ||
@@ -1750,7 +1765,9 @@ async function loadBills() {
 
         const response =
             await fetch(
-                "/api/billing"
+
+                `${API_BASE}/billing`
+
             );
 
 
@@ -1787,6 +1804,7 @@ async function loadBills() {
         renderBills(
             rows
         );
+
 
     } catch (error) {
 
@@ -1843,7 +1861,9 @@ function renderBills(
 
 
     if (!body) {
+
         return;
+
     }
 
 
@@ -1859,7 +1879,9 @@ function renderBills(
                     colspan="5"
                     class="empty-state"
                 >
+
                     No medicine issue transactions yet.
+
                 </td>
 
             </tr>
@@ -1881,11 +1903,13 @@ function renderBills(
                         <td>
 
                             <strong>
+
                                 ${escapeHtml(
                                     row.medicine_name
                                     ||
                                     "Unknown"
                                 )}
+
                             </strong>
 
                         </td>
@@ -1962,7 +1986,9 @@ function resetBillingForm() {
         id => {
 
             const element =
-                getElement(id);
+                getElement(
+                    id
+                );
 
 
             if (element) {
@@ -2021,14 +2047,19 @@ function showMessage(
 ) {
 
     const element =
-        getElement(id);
+        getElement(
+            id
+        );
 
 
     if (!element) {
 
         console.log(
+
             `[${type.toUpperCase()}]`,
+
             message
+
         );
 
         return;
@@ -2079,7 +2110,9 @@ function setText(
 ) {
 
     const element =
-        getElement(id);
+        getElement(
+            id
+        );
 
 
     if (element) {

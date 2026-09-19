@@ -3,7 +3,8 @@
    DASHBOARD JAVASCRIPT
    ========================================= */
 
-const API_BASE = "/api";
+const API_BASE =
+    "https://medsupply-oegb.onrender.com/api";
 
 let intelligenceData = [];
 let dashboardLoaded = false;
@@ -19,29 +20,35 @@ function $(id) {
 
 
 function showElement(id) {
+
     const element = $(id);
 
     if (element) {
         element.style.display = "";
     }
+
 }
 
 
 function hideElement(id) {
+
     const element = $(id);
 
     if (element) {
         element.style.display = "none";
     }
+
 }
 
 
 function setText(id, value) {
+
     const element = $(id);
 
     if (element) {
         element.textContent = value;
     }
+
 }
 
 
@@ -50,29 +57,48 @@ function setText(id, value) {
    ========================================= */
 
 function formatNumber(value) {
-    const number = Number(value || 0);
 
-    return number.toLocaleString("en-IN", {
-        maximumFractionDigits: 2
-    });
+    const number =
+        Number(value || 0);
+
+    return number.toLocaleString(
+        "en-IN",
+        {
+            maximumFractionDigits: 2
+        }
+    );
+
 }
 
 
 function formatInteger(value) {
-    const number = Math.round(Number(value || 0));
 
-    return number.toLocaleString("en-IN");
+    const number =
+        Math.round(
+            Number(value || 0)
+        );
+
+    return number.toLocaleString(
+        "en-IN"
+    );
+
 }
 
 
 function formatCurrency(value) {
-    const number = Number(value || 0);
 
-    return number.toLocaleString("en-IN", {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: 2
-    });
+    const number =
+        Number(value || 0);
+
+    return number.toLocaleString(
+        "en-IN",
+        {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 2
+        }
+    );
+
 }
 
 
@@ -82,17 +108,28 @@ function formatDate(value) {
         return "—";
     }
 
-    const date = new Date(value);
+    const date =
+        new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
         return value;
+
     }
 
-    return date.toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-    });
+    return date.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
+
 }
 
 
@@ -102,16 +139,38 @@ function getDaysUntil(dateValue) {
         return null;
     }
 
-    const expiry = new Date(dateValue);
-    const today = new Date();
+    const expiry =
+        new Date(dateValue);
 
-    expiry.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
+    const today =
+        new Date();
+
+    expiry.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
 
     return Math.ceil(
-        (expiry - today) /
-        (1000 * 60 * 60 * 24)
+        (
+            expiry - today
+        ) /
+        (
+            1000 *
+            60 *
+            60 *
+            24
+        )
     );
+
 }
 
 
@@ -121,88 +180,150 @@ function getDaysUntil(dateValue) {
 
 function normalizeStatus(status) {
 
-    return String(status || "")
+    return String(
+        status || ""
+    )
         .trim()
         .toUpperCase()
-        .replace(/[\s-]+/g, "_");
+        .replace(
+            /[\s-]+/g,
+            "_"
+        );
+
 }
 
 
 function statusLabel(status) {
 
-    const normalized = normalizeStatus(status);
+    const normalized =
+        normalizeStatus(status);
 
     const labels = {
-        NORMAL: "Normal",
-        LOW: "Low",
-        CRITICAL: "Critical",
-        STOCKOUT_RISK: "Stockout Risk",
-        EXPIRING_SOON: "Expiring Soon",
-        INFO: "Info",
-        WARNING: "Warning",
-        HIGH: "High"
+
+        NORMAL:
+            "Normal",
+
+        LOW:
+            "Low",
+
+        CRITICAL:
+            "Critical",
+
+        STOCKOUT_RISK:
+            "Stockout Risk",
+
+        EXPIRING_SOON:
+            "Expiring Soon",
+
+        INFO:
+            "Info",
+
+        WARNING:
+            "Warning",
+
+        HIGH:
+            "High"
+
     };
 
-    return labels[normalized] || status || "Unknown";
+    return (
+        labels[normalized]
+        ||
+        status
+        ||
+        "Unknown"
+    );
+
 }
 
 
 function riskClass(status) {
 
-    const normalized = normalizeStatus(status);
+    const normalized =
+        normalizeStatus(status);
 
     if (
         normalized === "CRITICAL" ||
         normalized === "STOCKOUT_RISK"
     ) {
+
         return "risk-critical";
+
     }
 
-    if (normalized === "HIGH") {
+    if (
+        normalized === "HIGH"
+    ) {
+
         return "risk-high";
+
     }
 
-    if (normalized === "WARNING" ||
+    if (
+        normalized === "WARNING" ||
         normalized === "LOW" ||
-        normalized === "EXPIRING_SOON") {
+        normalized === "EXPIRING_SOON"
+    ) {
+
         return "risk-warning";
+
     }
 
     return "risk-normal";
+
 }
 
 
 function riskBadge(status) {
 
-    const normalized = normalizeStatus(status);
+    const normalized =
+        normalizeStatus(status);
 
-    let className = "badge badge-neutral";
+    let className =
+        "badge badge-neutral";
 
     if (
         normalized === "CRITICAL" ||
         normalized === "STOCKOUT_RISK"
     ) {
-        className = "badge badge-danger";
+
+        className =
+            "badge badge-danger";
+
     } else if (
         normalized === "HIGH"
     ) {
-        className = "badge badge-high";
+
+        className =
+            "badge badge-high";
+
     } else if (
         normalized === "WARNING" ||
         normalized === "LOW" ||
         normalized === "EXPIRING_SOON"
     ) {
-        className = "badge badge-warning";
+
+        className =
+            "badge badge-warning";
+
     } else if (
         normalized === "NORMAL" ||
         normalized === "INFO"
     ) {
-        className = "badge badge-success";
+
+        className =
+            "badge badge-success";
+
     }
 
-    return `<span class="${className}">
-        ${escapeHtml(statusLabel(status))}
-    </span>`;
+    return `
+        <span class="${className}">
+            ${escapeHtml(
+                statusLabel(status)
+            )}
+        </span>
+    `;
+
 }
 
 
@@ -216,16 +337,21 @@ function trendClass(trend) {
     if (
         normalized.includes("INCREAS")
     ) {
+
         return "trend-up";
+
     }
 
     if (
         normalized.includes("DECREAS")
     ) {
+
         return "trend-down";
+
     }
 
     return "trend-stable";
+
 }
 
 
@@ -236,15 +362,24 @@ function trendLabel(trend) {
             .trim()
             .toUpperCase();
 
-    if (normalized.includes("INCREAS")) {
+    if (
+        normalized.includes("INCREAS")
+    ) {
+
         return "Increasing";
+
     }
 
-    if (normalized.includes("DECREAS")) {
+    if (
+        normalized.includes("DECREAS")
+    ) {
+
         return "Decreasing";
+
     }
 
     return "Stable";
+
 }
 
 
@@ -254,12 +389,30 @@ function trendLabel(trend) {
 
 function escapeHtml(value) {
 
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
 }
 
 
@@ -267,30 +420,42 @@ function escapeHtml(value) {
    MESSAGE HANDLING
    ========================================= */
 
-function showMessage(message, type = "info") {
+function showMessage(
+    message,
+    type = "info"
+) {
 
-    const element = $("dashboardMessage");
+    const element =
+        $("dashboardMessage");
 
     if (!element) {
         return;
     }
 
-    element.textContent = message;
+    element.textContent =
+        message;
 
     element.className =
         `dashboard-message ${type}`;
 
-    element.style.display = "block";
+    element.style.display =
+        "block";
+
 }
 
 
 function hideMessage() {
 
-    const element = $("dashboardMessage");
+    const element =
+        $("dashboardMessage");
 
     if (element) {
-        element.style.display = "none";
+
+        element.style.display =
+            "none";
+
     }
+
 }
 
 
@@ -300,45 +465,64 @@ function hideMessage() {
 
 async function fetchIntelligence() {
 
-    const response = await fetch(
-        `${API_BASE}/intelligence`,
-        {
-            method: "GET",
-            headers: {
-                "Accept": "application/json"
+    const response =
+        await fetch(
+            `${API_BASE}/intelligence`,
+            {
+                method: "GET",
+
+                headers: {
+                    "Accept":
+                        "application/json"
+                }
             }
-        }
-    );
+        );
 
     let result;
 
     try {
-        result = await response.json();
+
+        result =
+            await response.json();
+
     } catch (error) {
+
         throw new Error(
             `Server returned invalid JSON (${response.status}).`
         );
+
     }
 
     if (!response.ok) {
 
         throw new Error(
-            result.error ||
-            result.message ||
+
+            result.error
+            ||
+            result.message
+            ||
             `Request failed with status ${response.status}.`
+
         );
+
     }
 
     if (!result.success) {
 
         throw new Error(
-            result.error ||
-            result.message ||
+
+            result.error
+            ||
+            result.message
+            ||
             "Intelligence engine failed."
+
         );
+
     }
 
     return result;
+
 }
 
 
@@ -349,16 +533,20 @@ async function fetchIntelligence() {
 function normalizeIntelligenceItem(item) {
 
     const forecast =
-        item.forecast ||
-        item.demand ||
+        item.forecast
+        ||
+        item.demand
+        ||
         {};
 
     const risk =
-        item.risk ||
+        item.risk
+        ||
         {};
 
     const procurement =
-        item.procurement ||
+        item.procurement
+        ||
         {};
 
     const stock =
@@ -393,22 +581,37 @@ function normalizeIntelligenceItem(item) {
         );
 
     if (
-        !Number.isFinite(daysOfCover) ||
+        !Number.isFinite(daysOfCover)
+        ||
         daysOfCover < 0
     ) {
 
-        if (dailyDemand > 0) {
-            daysOfCover = stock / dailyDemand;
+        if (
+            dailyDemand > 0
+        ) {
+
+            daysOfCover =
+                stock /
+                dailyDemand;
+
         } else {
-            daysOfCover = Infinity;
+
+            daysOfCover =
+                Infinity;
+
         }
+
     }
 
     const riskLevel =
-        risk.severity ||
-        risk.risk_level ||
-        risk.status ||
-        item.status ||
+        risk.severity
+        ||
+        risk.risk_level
+        ||
+        risk.status
+        ||
+        item.status
+        ||
         "NORMAL";
 
     const recommendedOrder =
@@ -422,13 +625,17 @@ function normalizeIntelligenceItem(item) {
         );
 
     const expiryDate =
-        item.expiry_date ||
-        item.expiryDate ||
+        item.expiry_date
+        ||
+        item.expiryDate
+        ||
         null;
 
     const forecastModel =
-        forecast.model ||
-        item.model ||
+        forecast.model
+        ||
+        item.model
+        ||
         "Python Demand Intelligence";
 
     const confidence =
@@ -439,6 +646,7 @@ function normalizeIntelligenceItem(item) {
         );
 
     return {
+
         ...item,
 
         id:
@@ -446,15 +654,19 @@ function normalizeIntelligenceItem(item) {
             item.item_id,
 
         name:
-            item.name ||
-            item.medicine_name ||
+            item.name
+            ||
+            item.medicine_name
+            ||
             "Unknown Medicine",
 
         category:
-            item.category ||
+            item.category
+            ||
             "—",
 
-        current_stock: stock,
+        current_stock:
+            stock,
 
         minimum_stock:
             Number(
@@ -471,31 +683,42 @@ function normalizeIntelligenceItem(item) {
             ),
 
         criticality:
-            item.criticality ||
+            item.criticality
+            ||
             "MEDIUM",
 
-        expiry_date: expiryDate,
+        expiry_date:
+            expiryDate,
 
         status:
-            item.status ||
+            item.status
+            ||
             "NORMAL",
 
-        daily_demand: dailyDemand,
+        daily_demand:
+            dailyDemand,
 
-        days_of_cover: daysOfCover,
+        days_of_cover:
+            daysOfCover,
 
-        lead_time_days: leadTime,
+        lead_time_days:
+            leadTime,
 
-        risk_level: riskLevel,
+        risk_level:
+            riskLevel,
 
         risk_message:
-            risk.message ||
-            item.risk_message ||
+            risk.message
+            ||
+            item.risk_message
+            ||
             "",
 
         trend:
-            forecast.trend ||
-            item.trend ||
+            forecast.trend
+            ||
+            item.trend
+            ||
             "STABLE",
 
         trend_change:
@@ -505,17 +728,24 @@ function normalizeIntelligenceItem(item) {
                 0
             ),
 
-        confidence,
+        confidence:
+            confidence,
 
-        forecast_model: forecastModel,
+        forecast_model:
+            forecastModel,
 
-        recommended_order: recommendedOrder,
+        recommended_order:
+            recommendedOrder,
 
         procurement_reason:
-            procurement.reason ||
-            item.procurement_reason ||
+            procurement.reason
+            ||
+            item.procurement_reason
+            ||
             ""
+
     };
+
 }
 
 
@@ -530,36 +760,58 @@ function calculateKpis(items) {
 
     const totalStock =
         items.reduce(
-            (sum, item) =>
-                sum + Number(item.current_stock || 0),
+            (
+                sum,
+                item
+            ) =>
+                sum +
+                Number(
+                    item.current_stock ||
+                    0
+                ),
             0
         );
 
     const criticalRisks =
-        items.filter(item => {
+        items.filter(
+            item => {
 
-            const risk =
-                normalizeStatus(item.risk_level);
+                const risk =
+                    normalizeStatus(
+                        item.risk_level
+                    );
 
-            const status =
-                normalizeStatus(item.status);
+                const status =
+                    normalizeStatus(
+                        item.status
+                    );
 
-            return (
-                risk === "CRITICAL" ||
-                risk === "STOCKOUT_RISK" ||
-                status === "CRITICAL" ||
-                status === "STOCKOUT_RISK"
-            );
+                return (
 
-        }).length;
+                    risk === "CRITICAL"
+                    ||
+                    risk === "STOCKOUT_RISK"
+                    ||
+                    status === "CRITICAL"
+                    ||
+                    status === "STOCKOUT_RISK"
+
+                );
+
+            }
+        ).length;
 
 
     const procurementNeed =
         items.reduce(
-            (sum, item) =>
+            (
+                sum,
+                item
+            ) =>
                 sum +
                 Number(
-                    item.recommended_order || 0
+                    item.recommended_order ||
+                    0
                 ),
             0
         );
@@ -567,43 +819,60 @@ function calculateKpis(items) {
 
     const confidenceValues =
         items
-            .map(item =>
-                Number(item.confidence)
+            .map(
+                item =>
+                    Number(
+                        item.confidence
+                    )
             )
-            .filter(value =>
-                Number.isFinite(value) &&
-                value > 0
+            .filter(
+                value =>
+                    Number.isFinite(value)
+                    &&
+                    value > 0
             );
 
 
     const averageConfidence =
         confidenceValues.length
             ? confidenceValues.reduce(
-                (sum, value) =>
+                (
+                    sum,
+                    value
+                ) =>
                     sum + value,
                 0
-            ) / confidenceValues.length
+            ) /
+            confidenceValues.length
             : 0;
 
 
     setText(
         "totalMedicines",
-        formatInteger(totalMedicines)
+        formatInteger(
+            totalMedicines
+        )
     );
 
     setText(
         "totalStock",
-        formatInteger(totalStock)
+        formatInteger(
+            totalStock
+        )
     );
 
     setText(
         "criticalRisks",
-        formatInteger(criticalRisks)
+        formatInteger(
+            criticalRisks
+        )
     );
 
     setText(
         "procurementNeed",
-        formatInteger(procurementNeed)
+        formatInteger(
+            procurementNeed
+        )
     );
 
     setText(
@@ -616,14 +885,18 @@ function calculateKpis(items) {
 
     const model =
         items.find(
-            item => item.forecast_model
-        )?.forecast_model ||
+            item =>
+                item.forecast_model
+        )?.forecast_model
+        ||
         "Python Demand Intelligence";
+
 
     setText(
         "forecastModel",
         model
     );
+
 }
 
 
@@ -638,43 +911,59 @@ function calculateRiskSummary(items) {
     let warning = 0;
     let normal = 0;
 
-    items.forEach(item => {
 
-        const risk =
-            normalizeStatus(item.risk_level);
+    items.forEach(
+        item => {
 
-        const status =
-            normalizeStatus(item.status);
+            const risk =
+                normalizeStatus(
+                    item.risk_level
+                );
 
-        if (
-            risk === "CRITICAL" ||
-            risk === "STOCKOUT_RISK" ||
-            status === "CRITICAL" ||
-            status === "STOCKOUT_RISK"
-        ) {
+            const status =
+                normalizeStatus(
+                    item.status
+                );
 
-            critical++;
 
-        } else if (
-            risk === "HIGH"
-        ) {
+            if (
+                risk === "CRITICAL"
+                ||
+                risk === "STOCKOUT_RISK"
+                ||
+                status === "CRITICAL"
+                ||
+                status === "STOCKOUT_RISK"
+            ) {
 
-            high++;
+                critical++;
 
-        } else if (
-            risk === "WARNING" ||
-            risk === "LOW" ||
-            status === "LOW" ||
-            status === "EXPIRING_SOON"
-        ) {
+            } else if (
+                risk === "HIGH"
+            ) {
 
-            warning++;
+                high++;
 
-        } else {
+            } else if (
+                risk === "WARNING"
+                ||
+                risk === "LOW"
+                ||
+                status === "LOW"
+                ||
+                status === "EXPIRING_SOON"
+            ) {
 
-            normal++;
+                warning++;
+
+            } else {
+
+                normal++;
+
+            }
+
         }
-    });
+    );
 
 
     setText(
@@ -696,6 +985,7 @@ function calculateRiskSummary(items) {
         "normalRiskCount",
         normal
     );
+
 }
 
 
@@ -712,37 +1002,47 @@ function calculateInventoryStatus(items) {
     let expiring = 0;
 
 
-    items.forEach(item => {
+    items.forEach(
+        item => {
 
-        const status =
-            normalizeStatus(item.status);
+            const status =
+                normalizeStatus(
+                    item.status
+                );
 
-        if (status === "STOCKOUT_RISK") {
 
-            stockout++;
+            if (
+                status === "STOCKOUT_RISK"
+            ) {
 
-        } else if (status === "CRITICAL") {
+                stockout++;
 
-            critical++;
+            } else if (
+                status === "CRITICAL"
+            ) {
 
-        } else if (
-            status === "LOW"
-        ) {
+                critical++;
 
-            low++;
+            } else if (
+                status === "LOW"
+            ) {
 
-        } else if (
-            status === "EXPIRING_SOON"
-        ) {
+                low++;
 
-            expiring++;
+            } else if (
+                status === "EXPIRING_SOON"
+            ) {
 
-        } else {
+                expiring++;
 
-            normal++;
+            } else {
+
+                normal++;
+
+            }
+
         }
-
-    });
+    );
 
 
     setText(
@@ -769,6 +1069,7 @@ function calculateInventoryStatus(items) {
         "inventoryExpiringCount",
         expiring
     );
+
 }
 
 
@@ -788,211 +1089,326 @@ function renderPriorityMedicines(items) {
 
     const priorityItems =
         [...items]
-            .filter(item => {
+            .filter(
+                item => {
 
-                const status =
-                    normalizeStatus(item.status);
+                    const status =
+                        normalizeStatus(
+                            item.status
+                        );
 
-                const risk =
-                    normalizeStatus(item.risk_level);
+                    const risk =
+                        normalizeStatus(
+                            item.risk_level
+                        );
 
-                return (
-                    status !== "NORMAL" ||
-                    risk !== "NORMAL" ||
-                    Number(item.recommended_order || 0) > 0 ||
-                    Number(item.days_of_cover) <=
-                        Number(item.lead_time_days)
-                );
-            })
-            .sort((a, b) => {
+                    return (
 
-                const scoreA =
-                    getPriorityScore(a);
+                        status !== "NORMAL"
+                        ||
+                        risk !== "NORMAL"
+                        ||
+                        Number(
+                            item.recommended_order ||
+                            0
+                        ) > 0
+                        ||
+                        Number(
+                            item.days_of_cover
+                        ) <=
+                        Number(
+                            item.lead_time_days
+                        )
 
-                const scoreB =
-                    getPriorityScore(b);
+                    );
 
-                return scoreB - scoreA;
-            })
-            .slice(0, 12);
+                }
+            )
+            .sort(
+                (
+                    a,
+                    b
+                ) => {
+
+                    const scoreA =
+                        getPriorityScore(a);
+
+                    const scoreB =
+                        getPriorityScore(b);
+
+                    return (
+                        scoreB -
+                        scoreA
+                    );
+
+                }
+            )
+            .slice(
+                0,
+                12
+            );
 
 
     if (!priorityItems.length) {
 
         body.innerHTML = `
+
             <tr>
+
                 <td
                     colspan="7"
                     class="table-empty"
                 >
+
                     No medicines currently require attention.
+
                 </td>
+
             </tr>
+
         `;
 
         return;
+
     }
 
 
     body.innerHTML =
         priorityItems
-            .map(item => {
+            .map(
+                item => {
 
-                const days =
-                    Number(item.days_of_cover);
+                    const days =
+                        Number(
+                            item.days_of_cover
+                        );
 
-                const daysText =
-                    Number.isFinite(days)
-                        ? `${days.toFixed(1)} days`
-                        : "∞";
+                    const daysText =
+                        Number.isFinite(days)
+                            ? `${days.toFixed(1)} days`
+                            : "∞";
 
 
-                return `
-                    <tr>
+                    return `
 
-                        <td>
-                            <div class="medicine-name-cell">
+                        <tr>
+
+                            <td>
+
+                                <div class="medicine-name-cell">
+
+                                    <strong>
+                                        ${escapeHtml(
+                                            item.name
+                                        )}
+                                    </strong>
+
+                                    <small>
+                                        ${escapeHtml(
+                                            item.criticality ||
+                                            "MEDIUM"
+                                        )}
+                                    </small>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
                                 <strong>
-                                    ${escapeHtml(item.name)}
+                                    ${formatInteger(
+                                        item.current_stock
+                                    )}
                                 </strong>
 
-                                <small>
-                                    ${escapeHtml(
-                                        item.criticality ||
-                                        "MEDIUM"
-                                    )}
-                                </small>
-                            </div>
-                        </td>
+                            </td>
 
-                        <td>
-                            <strong>
-                                ${formatInteger(
-                                    item.current_stock
+
+                            <td>
+
+                                ${formatNumber(
+                                    item.daily_demand
                                 )}
-                            </strong>
-                        </td>
 
-                        <td>
-                            ${formatNumber(
-                                item.daily_demand
-                            )}
-                        </td>
+                            </td>
 
-                        <td>
-                            ${daysText}
-                        </td>
 
-                        <td>
-                            <span class="${trendClass(
-                                item.trend
-                            )}">
-                                ${trendLabel(
+                            <td>
+
+                                ${daysText}
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="${trendClass(
                                     item.trend
+                                )}">
+
+                                    ${trendLabel(
+                                        item.trend
+                                    )}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                ${riskBadge(
+                                    item.risk_level
                                 )}
-                            </span>
-                        </td>
 
-                        <td>
-                            ${riskBadge(
-                                item.risk_level
-                            )}
-                        </td>
+                            </td>
 
-                        <td>
-                            <strong>
-                                ${
-                                    item.recommended_order > 0
-                                        ? formatInteger(
-                                            item.recommended_order
-                                        )
-                                        : "—"
-                                }
-                            </strong>
-                        </td>
 
-                    </tr>
-                `;
-            })
+                            <td>
+
+                                <strong>
+
+                                    ${
+                                        item.recommended_order > 0
+                                            ? formatInteger(
+                                                item.recommended_order
+                                            )
+                                            : "—"
+                                    }
+
+                                </strong>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            )
             .join("");
+
 }
 
 
 function getPriorityScore(item) {
 
     const status =
-        normalizeStatus(item.status);
+        normalizeStatus(
+            item.status
+        );
 
     const risk =
-        normalizeStatus(item.risk_level);
+        normalizeStatus(
+            item.risk_level
+        );
 
     let score = 0;
 
 
     if (
-        status === "STOCKOUT_RISK" ||
+        status === "STOCKOUT_RISK"
+        ||
         risk === "STOCKOUT_RISK"
     ) {
+
         score += 100;
+
     }
 
+
     if (
-        status === "CRITICAL" ||
+        status === "CRITICAL"
+        ||
         risk === "CRITICAL"
     ) {
+
         score += 90;
+
     }
+
 
     if (
         risk === "HIGH"
     ) {
+
         score += 70;
+
     }
 
+
     if (
-        status === "LOW" ||
-        risk === "LOW" ||
+        status === "LOW"
+        ||
+        risk === "LOW"
+        ||
         risk === "WARNING"
     ) {
+
         score += 40;
+
     }
+
 
     if (
         status === "EXPIRING_SOON"
     ) {
+
         score += 30;
+
     }
 
 
     const days =
-        Number(item.days_of_cover);
+        Number(
+            item.days_of_cover
+        );
 
     const leadTime =
-        Number(item.lead_time_days);
+        Number(
+            item.lead_time_days
+        );
 
 
     if (
-        Number.isFinite(days) &&
+        Number.isFinite(days)
+        &&
         leadTime > 0
     ) {
 
-        if (days <= leadTime) {
+        if (
+            days <= leadTime
+        ) {
+
             score += 50;
+
         }
 
-        if (days <= leadTime / 2) {
+        if (
+            days <=
+            leadTime / 2
+        ) {
+
             score += 25;
+
         }
+
     }
 
 
     score += Math.min(
-        Number(item.recommended_order || 0) / 100,
+        Number(
+            item.recommended_order ||
+            0
+        ) / 100,
         20
     );
 
 
     return score;
+
 }
 
 
@@ -1012,73 +1428,106 @@ function renderProcurement(items) {
 
     const recommendations =
         [...items]
-            .filter(item =>
-                Number(item.recommended_order || 0) > 0
+            .filter(
+                item =>
+                    Number(
+                        item.recommended_order ||
+                        0
+                    ) > 0
             )
             .sort(
-                (a, b) =>
-                    Number(b.recommended_order || 0) -
-                    Number(a.recommended_order || 0)
+                (
+                    a,
+                    b
+                ) =>
+                    Number(
+                        b.recommended_order ||
+                        0
+                    ) -
+                    Number(
+                        a.recommended_order ||
+                        0
+                    )
             )
-            .slice(0, 8);
+            .slice(
+                0,
+                8
+            );
 
 
     if (!recommendations.length) {
 
         container.innerHTML = `
+
             <div class="table-empty">
+
                 No procurement actions required.
+
             </div>
+
         `;
 
         return;
+
     }
 
 
     container.innerHTML =
         recommendations
-            .map(item => {
+            .map(
+                item => {
 
-                const supplier =
-                    item.supplier_name ||
-                    item.supplier ||
-                    "Supplier not assigned";
+                    const supplier =
+                        item.supplier_name
+                        ||
+                        item.supplier
+                        ||
+                        "Supplier not assigned";
 
 
-                return `
-                    <div class="procurement-item">
+                    return `
 
-                        <div class="procurement-main">
+                        <div class="procurement-item">
 
-                            <strong>
-                                ${escapeHtml(item.name)}
-                            </strong>
+                            <div class="procurement-main">
 
-                            <span>
-                                ${escapeHtml(supplier)}
-                            </span>
+                                <strong>
+                                    ${escapeHtml(
+                                        item.name
+                                    )}
+                                </strong>
+
+                                <span>
+                                    ${escapeHtml(
+                                        supplier
+                                    )}
+                                </span>
+
+                            </div>
+
+
+                            <div class="procurement-quantity">
+
+                                <strong>
+                                    ${formatInteger(
+                                        item.recommended_order
+                                    )}
+                                </strong>
+
+                                <span>
+                                    units
+                                </span>
+
+                            </div>
 
                         </div>
 
+                    `;
 
-                        <div class="procurement-quantity">
-
-                            <strong>
-                                ${formatInteger(
-                                    item.recommended_order
-                                )}
-                            </strong>
-
-                            <span>
-                                units
-                            </span>
-
-                        </div>
-
-                    </div>
-                `;
-            })
+                }
+            )
             .join("");
+
 }
 
 
@@ -1098,117 +1547,174 @@ function renderExpiryWatch(items) {
 
     const expiryItems =
         items
-            .filter(item =>
-                item.expiry_date
+            .filter(
+                item =>
+                    item.expiry_date
             )
-            .map(item => ({
-                ...item,
-                days_until_expiry:
-                    getDaysUntil(
-                        item.expiry_date
-                    )
-            }))
-            .filter(item =>
-                item.days_until_expiry !== null &&
-                item.days_until_expiry <= 90
+            .map(
+                item => ({
+
+                    ...item,
+
+                    days_until_expiry:
+                        getDaysUntil(
+                            item.expiry_date
+                        )
+
+                })
+            )
+            .filter(
+                item =>
+                    item.days_until_expiry !== null
+                    &&
+                    item.days_until_expiry <= 90
             )
             .sort(
-                (a, b) =>
+                (
+                    a,
+                    b
+                ) =>
                     a.days_until_expiry -
                     b.days_until_expiry
             )
-            .slice(0, 12);
+            .slice(
+                0,
+                12
+            );
 
 
     if (!expiryItems.length) {
 
         body.innerHTML = `
+
             <tr>
+
                 <td
                     colspan="5"
                     class="table-empty"
                 >
+
                     No medicines are approaching expiry.
+
                 </td>
+
             </tr>
+
         `;
 
         return;
+
     }
 
 
     body.innerHTML =
         expiryItems
-            .map(item => {
+            .map(
+                item => {
 
-                const days =
-                    item.days_until_expiry;
-
-
-                let expiryRisk =
-                    "NORMAL";
-
-                if (days <= 0) {
-
-                    expiryRisk = "CRITICAL";
-
-                } else if (days <= 15) {
-
-                    expiryRisk = "CRITICAL";
-
-                } else if (days <= 30) {
-
-                    expiryRisk = "WARNING";
-
-                } else {
-
-                    expiryRisk = "INFO";
-                }
+                    const days =
+                        item.days_until_expiry;
 
 
-                return `
-                    <tr>
+                    let expiryRisk =
+                        "NORMAL";
 
-                        <td>
-                            <strong>
-                                ${escapeHtml(
-                                    item.name
+
+                    if (
+                        days <= 0
+                    ) {
+
+                        expiryRisk =
+                            "CRITICAL";
+
+                    } else if (
+                        days <= 15
+                    ) {
+
+                        expiryRisk =
+                            "CRITICAL";
+
+                    } else if (
+                        days <= 30
+                    ) {
+
+                        expiryRisk =
+                            "WARNING";
+
+                    } else {
+
+                        expiryRisk =
+                            "INFO";
+
+                    }
+
+
+                    return `
+
+                        <tr>
+
+                            <td>
+
+                                <strong>
+
+                                    ${escapeHtml(
+                                        item.name
+                                    )}
+
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                ${formatDate(
+                                    item.expiry_date
                                 )}
-                            </strong>
-                        </td>
 
-                        <td>
-                            ${formatDate(
-                                item.expiry_date
-                            )}
-                        </td>
+                            </td>
 
-                        <td>
-                            <strong>
-                                ${
-                                    days <= 0
-                                        ? "Expired"
-                                        : `${days} days`
-                                }
-                            </strong>
-                        </td>
 
-                        <td>
-                            ${formatInteger(
-                                item.current_stock
-                            )}
-                        </td>
+                            <td>
 
-                        <td>
-                            ${riskBadge(
-                                expiryRisk
-                            )}
-                        </td>
+                                <strong>
 
-                    </tr>
-                `;
-            })
+                                    ${
+                                        days <= 0
+                                            ? "Expired"
+                                            : `${days} days`
+                                    }
+
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                ${formatInteger(
+                                    item.current_stock
+                                )}
+
+                            </td>
+
+
+                            <td>
+
+                                ${riskBadge(
+                                    expiryRisk
+                                )}
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            )
             .join("");
+
 }
 
 
@@ -1235,6 +1741,7 @@ function updateAiStatus(items) {
             "badge badge-warning";
 
         return;
+
     }
 
 
@@ -1243,6 +1750,7 @@ function updateAiStatus(items) {
 
     status.className =
         "badge badge-success";
+
 }
 
 
@@ -1253,7 +1761,9 @@ function updateAiStatus(items) {
 function renderDashboard(result) {
 
     const rawData =
-        Array.isArray(result.data)
+        Array.isArray(
+            result.data
+        )
             ? result.data
             : [];
 
@@ -1293,16 +1803,20 @@ function renderDashboard(result) {
     );
 
 
-    dashboardLoaded = true;
+    dashboardLoaded =
+        true;
 
 
     const status =
         $("dashboardStatus");
 
+
     if (status) {
 
         status.innerHTML = `
+
             <span class="status-dot"></span>
+
             Updated ${new Date().toLocaleTimeString(
                 "en-IN",
                 {
@@ -1310,8 +1824,11 @@ function renderDashboard(result) {
                     minute: "2-digit"
                 }
             )}
+
         `;
+
     }
+
 }
 
 
@@ -1332,12 +1849,18 @@ async function loadDashboard() {
 
 
     if (loading) {
-        loading.style.display = "block";
+
+        loading.style.display =
+            "block";
+
     }
 
 
     if (refreshButton) {
-        refreshButton.disabled = true;
+
+        refreshButton.disabled =
+            true;
+
     }
 
 
@@ -1346,7 +1869,9 @@ async function loadDashboard() {
         const result =
             await fetchIntelligence();
 
-        renderDashboard(result);
+        renderDashboard(
+            result
+        );
 
     } catch (error) {
 
@@ -1357,33 +1882,51 @@ async function loadDashboard() {
 
 
         showMessage(
-            error.message ||
+
+            error.message
+            ||
             "Unable to load dashboard intelligence.",
+
             "error"
+
         );
 
 
         const status =
             $("dashboardStatus");
 
+
         if (status) {
 
             status.innerHTML = `
+
                 <span class="status-dot"></span>
+
                 Connection Error
+
             `;
+
         }
 
     } finally {
 
         if (loading) {
-            loading.style.display = "none";
+
+            loading.style.display =
+                "none";
+
         }
 
+
         if (refreshButton) {
-            refreshButton.disabled = false;
+
+            refreshButton.disabled =
+                false;
+
         }
+
     }
+
 }
 
 
@@ -1395,6 +1938,7 @@ function setupRefreshButton() {
 
     const button =
         $("refreshDashboardBtn");
+
 
     if (!button) {
         return;
@@ -1409,6 +1953,7 @@ function setupRefreshButton() {
 
         }
     );
+
 }
 
 
@@ -1441,6 +1986,7 @@ function setupAutoRefresh() {
         },
         5 * 60 * 1000
     );
+
 }
 
 
@@ -1470,9 +2016,10 @@ window.MedSupplyDashboard = {
 
     loadDashboard,
 
-    getData: () =>
-        intelligenceData,
+    getData:
+        () => intelligenceData,
 
-    refresh: loadDashboard
+    refresh:
+        loadDashboard
 
 };
